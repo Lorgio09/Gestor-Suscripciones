@@ -4,8 +4,6 @@
 **El problema:** Las personas olvidan cancelar sus suscripciones digitales a tiempo, lo que genera una pérdida de dinero mensual constante por servicios que no utilizan.
 **La solución propuesta:** Una aplicación que registre los servicios, el costo mensual y la fecha de cobro, además de alertar sobre futuros cobros.
 
-**Tipo de Proyecto:** App móvil.
-**Modalidad:** Sin IA
 ## Hipótesis del proyecto
 Si los usuarios cuentan con una herramienta que centralice el registro de sus suscripciones, y emita alertas antes de la fecha de cobro, entonces cancelarán los servicios inactivos a tiempo y reducirán su fuga de dinero mensual.
 
