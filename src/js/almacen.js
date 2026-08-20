@@ -1,4 +1,4 @@
-const clave_pagos=["pagos"]
+const clave_pagos="pagos"
 
 
 function leerPagos() {
