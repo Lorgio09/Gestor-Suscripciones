@@ -13,7 +13,7 @@ function pintarTabla() {
         //colspan=4 porque hay 4 columnas, también lo centramos
         tablaCuerpo.innerHTML = `
             <tr>
-                <td=colspan='4' class='text-center py-4 text-muted'>
+                <td colspan='4' class='text-center py-4 text-muted'>
                     No hay suscripciones registradas.
                 </td>
             </tr>

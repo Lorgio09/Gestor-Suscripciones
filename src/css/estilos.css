@@ -48,3 +48,13 @@ input {
     color: red;
     min-height: 20px;
 }
+
+button{
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #502dce;
+}
+
+form {
+    margin-bottom: 20px;
+}
