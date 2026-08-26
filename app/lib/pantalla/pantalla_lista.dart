@@ -3,7 +3,7 @@ import '../almacen/almacen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../modelos/pago.dart';
 import 'pantalla_registro.dart';
-import 'pantalla_editar.dart';
+import 'pantalla_detalle.dart';
 
 class PantallaLista extends StatefulWidget {
   const PantallaLista({super.key});
@@ -28,42 +28,9 @@ class _EstadoLista extends State<PantallaLista> {
     });
   }
 
-  void confirmarEliminar(int indice) {
-    showDialog(
-      context: context,
-      builder: (contexto) => AlertDialog(
-        title: const Text('Eliminar suscripcion'),
-        content: Text('¿Eliminar "${listaPagos[indice].nombre}"? Esta accion no se puede deshacer.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(contexto),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(contexto);
-              await eliminarPago(indice);
-              cargarPagos();
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void abrirUrl(String url) async {
     final uri = Uri.parse(url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
-  String formatearFecha(String fecha) {
-    final partes = fecha.split('-');
-    if (partes.length == 3) {
-      return '${partes[2]}/${partes[1]}/${partes[0]}';
-    }
-    return fecha;
   }
 
   String calcularProximoPago(String fecha) {
@@ -84,7 +51,7 @@ class _EstadoLista extends State<PantallaLista> {
     final mesStr = mes.toString().padLeft(2, '0');
     return '$diaStr/$mesStr/$anio';
   }
-  
+
   void irARegistro() async {
     await Navigator.push(
       context,
@@ -93,11 +60,11 @@ class _EstadoLista extends State<PantallaLista> {
     cargarPagos();
   }
 
-  void irAEditar(int indice, Pago pago) async {
+  void irADetalle(int indice, Pago pago) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => PantallaEditar(indice: indice, pago: pago),
+        builder: (ctx) => PantallaDetalle(indice: indice, pago: pago),
       ),
     );
     cargarPagos();
@@ -108,75 +75,61 @@ class _EstadoLista extends State<PantallaLista> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis Suscripciones'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: ElevatedButton.icon(
-              onPressed: irARegistro,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Registrar nuevo pago'),
-            ),
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: SizedBox(
-          width: double.infinity,
-          child: Card(
-            child: listaPagos.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.all(40),
-                    child: Center(child: Text('No hay suscripciones registradas.')),
-                  )
-                : DataTable(
-                    columnSpacing: 20,
-                    horizontalMargin: 16,
-                    columns: const [
-                      DataColumn(label: Text('Servicio')),
-                      DataColumn(label: Text('Costo')),
-                      DataColumn(label: Text('Proximo pago')),
-                      DataColumn(label: Text('Accion')),
-                    ],
-                    rows: List.generate(listaPagos.length, (i) {
-                      final pago = listaPagos[i];
-                      return DataRow(cells: [
-                        DataCell(Text(pago.nombre)),
-                        DataCell(Text('Bs ${pago.costo.toStringAsFixed(2)}')),
-                        DataCell(Text(calcularProximoPago(pago.fecha))),
-                        DataCell(
+      body: listaPagos.isEmpty
+          ? const Center(child: Text('No hay suscripciones registradas.'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: listaPagos.length,
+              itemBuilder: (contexto, i) {
+                final pago = listaPagos[i];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: InkWell(
+                    onTap: () => irADetalle(i, pago),
+                    borderRadius: BorderRadius.circular(6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              InkWell(
-                                onTap: () => abrirUrl(pago.url),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(Icons.open_in_new, size: 16, color: Colors.blue),
-                                ),
+                              Text(
+                                pago.nombre,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                               ),
-                              InkWell(
-                                onTap: () => irAEditar(i, pago),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(Icons.edit, size: 16),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () => confirmarEliminar(i),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(4),
-                                  child: Icon(Icons.delete, size: 16, color: Colors.red),
-                                ),
+                              Text(
+                                'Bs ${pago.costo.toStringAsFixed(2)}',
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
-                        ),
-                      ]);
-                    }),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Proximo pago: ${calcularProximoPago(pago.fecha)}',
+                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => abrirUrl(pago.url),
+                              child: const Text('Ir a pagar'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-          ),
-        ),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF444444),
+        onPressed: irARegistro,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

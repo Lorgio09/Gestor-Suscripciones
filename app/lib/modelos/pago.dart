@@ -15,7 +15,7 @@ class Pago {
     this.estado = "activa",
   });
 
-  // objeto -> mapa (para guardar)
+  
   Map<String, dynamic> toJson() {
     return {
       'nombre': nombre,
@@ -26,7 +26,7 @@ class Pago {
     };
   }
 
-  // mapa -> objeto (al leer)
+  
   factory Pago.fromJson(Map<String, dynamic> json) {
     return Pago(
       nombre: json['nombre'],
