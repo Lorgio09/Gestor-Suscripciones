@@ -15,19 +15,11 @@ class PantallaDetalle extends StatefulWidget {
 
 class _EstadoDetalle extends State<PantallaDetalle> {
   late Pago pago;
-  late final TextEditingController controlNombre;
-  late final TextEditingController controlCosto;
-  late final TextEditingController controlFecha;
-  late final TextEditingController controlUrl;
 
   @override
   void initState() {
     super.initState();
     pago = widget.pago;
-    controlNombre = TextEditingController(text: pago.nombre);
-    controlCosto = TextEditingController(text: 'Bs ${pago.costo.toStringAsFixed(2)}');
-    controlFecha = TextEditingController(text: pago.fecha);
-    controlUrl = TextEditingController(text: pago.url);
   }
 
   Future<void> irAEditar() async {
@@ -44,19 +36,15 @@ class _EstadoDetalle extends State<PantallaDetalle> {
 
     setState(() {
       pago = lista[widget.indice];
-      controlNombre.text = pago.nombre;
-      controlCosto.text = 'Bs ${pago.costo.toStringAsFixed(2)}';
-      controlFecha.text = pago.fecha;
-      controlUrl.text = pago.url;
     });
   }
 
-  void confirmarEliminar() {
+void confirmarEliminar() {
     showDialog(
       context: context,
       builder: (contexto) => AlertDialog(
-        title: const Text('Eliminar suscripcion'),
-        content: Text('¿Eliminar "${pago.nombre}"? Esta accion no se puede deshacer.'),
+        title: const Text('Eliminar suscripción'),
+        content: Text('¿Eliminar "${pago.nombre}"? Esta acción no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(contexto),
@@ -68,7 +56,7 @@ class _EstadoDetalle extends State<PantallaDetalle> {
               await eliminarPago(widget.indice);
               if (mounted) Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: const Color.fromARGB(255, 0, 0, 0)),
             child: const Text('Eliminar'),
           ),
         ],
@@ -76,20 +64,11 @@ class _EstadoDetalle extends State<PantallaDetalle> {
     );
   }
 
-  @override
-  void dispose() {
-    controlNombre.dispose();
-    controlCosto.dispose();
-    controlFecha.dispose();
-    controlUrl.dispose();
-    super.dispose();
-  }
-
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalle de suscripcion'),
+        title: const Text('Detalle de Suscripción'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -97,44 +76,76 @@ class _EstadoDetalle extends State<PantallaDetalle> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Card(
+              elevation: 2,
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Servicio', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
-                    TextField(controller: controlNombre, enabled: false),
-                    const SizedBox(height: 16),
+                    // Jerarquía principal (título grande, sin etiqueta "Servicio")
+                    Text(
+                      pago.nombre,
+                      style: const TextStyle(
+                        fontSize: 26, 
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    const SizedBox(height: 32),
 
-                    const Text('Costo mensual (Bs)', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
-                    TextField(controller: controlCosto, enabled: false),
-                    const SizedBox(height: 16),
+                    const Text(
+                      'Costo mensual', 
+                      style: TextStyle(color: Colors.black54, fontSize: 13)
+                    ),
+                    const SizedBox(height: 8), // 8px de separación pequeña
+                    Text(
+                      'Bs ${pago.costo.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16), // 16px para contenido relacionado
 
-                    const Text('Fecha de pago', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
-                    TextField(controller: controlFecha, enabled: false),
-                    const SizedBox(height: 16),
+                    const Text(
+                      'Fecha de pago', 
+                      style: TextStyle(color: Colors.black54, fontSize: 13)
+                    ),
+                    const SizedBox(height: 8), // 8px
+                    Text(
+                      pago.fecha,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16), // 16px
 
-                    const Text('URL para cancelar', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
-                    TextField(controller: controlUrl, enabled: false),
-                    const SizedBox(height: 20),
-
+                    const Text(
+                      'URL para cancelar', 
+                      style: TextStyle(color: Colors.black54, fontSize: 13)
+                    ),
+                    const SizedBox(height: 8), // Escala: 8px
+                    Text(
+                      pago.url,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 32),
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton(
                             onPressed: irAEditar,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF333333),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
                             child: const Text('Editar'),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: confirmarEliminar,
-                            style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.black87,
+                              side: const BorderSide(color: Colors.black54),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
                             child: const Text('Eliminar'),
                           ),
                         ),
