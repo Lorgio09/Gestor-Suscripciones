@@ -1,37 +1,60 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 import '../modelos/pago.dart';
 
-const clavePagos = "pagos";
+Database? baseDatos;
 
-Future<List<Pago>> leerPagos() async {
-  final prefs = await SharedPreferences.getInstance();
-  final texto = prefs.getString(clavePagos);
-  if (texto == null) return [];
-  final List<dynamic> listaJson = jsonDecode(texto);
-  return listaJson.map((item) => Pago.fromJson(item)).toList();
+Future<Database> abrirBase() async {
+  if (baseDatos != null) return baseDatos!;
+
+  final ruta = join(await getDatabasesPath(), 'suscripciones.db');
+  baseDatos = await openDatabase(
+    ruta,
+    version: 1,
+    onCreate: (base, version) async {
+      await base.execute(
+        'CREATE TABLE pagos ('
+        'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+        'nombre TEXT, '
+        'costo REAL, '
+        'fecha TEXT, '
+        'url TEXT, '
+        'estado TEXT)',
+      );
+    },
+  );
+  return baseDatos!;
 }
 
-Future<void> guardarPagos(List<Pago> lista) async {
-  final prefs = await SharedPreferences.getInstance();
-  final texto = jsonEncode(lista.map((p) => p.toJson()).toList());
-  await prefs.setString(clavePagos, texto);
+Future<List<Pago>> leerPagos() async {
+  final base = await abrirBase();
+  final filas = await base.query('pagos', orderBy: 'id');
+  return filas.map((fila) => Pago.desdeMapa(fila)).toList();
+}
+
+Future<Pago?> buscarPago(int id) async {
+  final base = await abrirBase();
+  final filas = await base.query('pagos', where: 'id = ?', whereArgs: [id]);
+  if (filas.isEmpty) return null;
+  return Pago.desdeMapa(filas.first);
 }
 
 Future<void> agregarPago(Pago nuevoPago) async {
-  final lista = await leerPagos();
-  lista.add(nuevoPago);
-  await guardarPagos(lista);
+  final base = await abrirBase();
+  await base.insert('pagos', nuevoPago.aMapa());
 }
 
-Future<void> actualizarPago(int indice, Pago pagoEditado) async {
-  final lista = await leerPagos();
-  lista[indice] = pagoEditado;
-  await guardarPagos(lista);
+Future<void> actualizarPago(int id, Pago pagoEditado) async {
+  final base = await abrirBase();
+  await base.update(
+    'pagos',
+    pagoEditado.aMapa(),
+    where: 'id = ?',
+    whereArgs: [id],
+  );
 }
 
-Future<void> eliminarPago(int indice) async {
-  final lista = await leerPagos();
-  lista.removeAt(indice);
-  await guardarPagos(lista);
+Future<void> eliminarPago(int id) async {
+  final base = await abrirBase();
+  await base.delete('pagos', where: 'id = ?', whereArgs: [id]);
 }

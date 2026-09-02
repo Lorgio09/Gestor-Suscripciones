@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
+import '../colores.dart';
 import '../modelos/pago.dart';
 import 'pantalla_editar.dart';
 
 class PantallaDetalle extends StatefulWidget {
-  final int indice;
   final Pago pago;
 
-  const PantallaDetalle({super.key, required this.indice, required this.pago});
+  const PantallaDetalle({super.key, required this.pago});
 
   @override
   State<PantallaDetalle> createState() => _EstadoDetalle();
@@ -26,20 +26,20 @@ class _EstadoDetalle extends State<PantallaDetalle> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => PantallaEditar(indice: widget.indice, pago: pago),
+        builder: (ctx) => PantallaEditar(pago: pago),
       ),
     );
 
-    final lista = await leerPagos();
+    final pagoActualizado = await buscarPago(pago.id!);
     if (!mounted) return;
-    if (widget.indice >= lista.length) return;
+    if (pagoActualizado == null) return;
 
     setState(() {
-      pago = lista[widget.indice];
+      pago = pagoActualizado;
     });
   }
 
-void confirmarEliminar() {
+  void confirmarEliminar() {
     showDialog(
       context: context,
       builder: (contexto) => AlertDialog(
@@ -53,10 +53,10 @@ void confirmarEliminar() {
           TextButton(
             onPressed: () async {
               Navigator.pop(contexto);
-              await eliminarPago(widget.indice);
+              await eliminarPago(pago.id!);
               if (mounted) Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: const Color.fromARGB(255, 0, 0, 0)),
+            style: TextButton.styleFrom(foregroundColor: colorError),
             child: const Text('Eliminar'),
           ),
         ],
@@ -64,7 +64,24 @@ void confirmarEliminar() {
     );
   }
 
-@override
+  Widget filaDato(String etiqueta, String valor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          etiqueta,
+          style: const TextStyle(fontSize: 13, color: colorTextoSuave),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          valor,
+          style: const TextStyle(fontSize: 16, color: colorTexto),
+        ),
+      ],
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -76,64 +93,35 @@ void confirmarEliminar() {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Card(
-              elevation: 2,
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Jerarquía principal (título grande, sin etiqueta "Servicio")
                     Text(
                       pago.nombre,
                       style: const TextStyle(
-                        fontSize: 26, 
-                        fontWeight: FontWeight.bold
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: colorTexto,
                       ),
                     ),
+                    const SizedBox(height: 24),
+
+                    filaDato('Costo mensual', 'Bs ${pago.costo.toStringAsFixed(2)}'),
+                    const SizedBox(height: 16),
+
+                    filaDato('Fecha de pago', pago.fecha),
+                    const SizedBox(height: 16),
+
+                    filaDato('URL para cancelar', pago.url),
                     const SizedBox(height: 32),
 
-                    const Text(
-                      'Costo mensual', 
-                      style: TextStyle(color: Colors.black54, fontSize: 13)
-                    ),
-                    const SizedBox(height: 8), // 8px de separación pequeña
-                    Text(
-                      'Bs ${pago.costo.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 16), // 16px para contenido relacionado
-
-                    const Text(
-                      'Fecha de pago', 
-                      style: TextStyle(color: Colors.black54, fontSize: 13)
-                    ),
-                    const SizedBox(height: 8), // 8px
-                    Text(
-                      pago.fecha,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 16), // 16px
-
-                    const Text(
-                      'URL para cancelar', 
-                      style: TextStyle(color: Colors.black54, fontSize: 13)
-                    ),
-                    const SizedBox(height: 8), // Escala: 8px
-                    Text(
-                      pago.url,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 32),
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton(
                             onPressed: irAEditar,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF333333),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
                             child: const Text('Editar'),
                           ),
                         ),
@@ -142,9 +130,8 @@ void confirmarEliminar() {
                           child: OutlinedButton(
                             onPressed: confirmarEliminar,
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.black87,
-                              side: const BorderSide(color: Colors.black54),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              foregroundColor: colorError,
+                              side: const BorderSide(color: colorError),
                             ),
                             child: const Text('Eliminar'),
                           ),
