@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
+import '../colores.dart';
 import '../modelos/pago.dart';
 
 class PantallaEditar extends StatefulWidget {
-  final int indice;
   final Pago pago;
 
-  const PantallaEditar({super.key, required this.indice, required this.pago});
+  const PantallaEditar({super.key, required this.pago});
 
   @override
   State<PantallaEditar> createState() => _EstadoEditar();
@@ -17,52 +17,63 @@ class _EstadoEditar extends State<PantallaEditar> {
   late final TextEditingController controlCosto;
   late final TextEditingController controlFecha;
   late final TextEditingController controlUrl;
-  String msjError = '';
+
+  String? errorNombre;
+  String? errorCosto;
+  String? errorFecha;
+  String? errorUrl;
 
   @override
   void initState() {
     super.initState();
     controlNombre = TextEditingController(text: widget.pago.nombre);
-    controlCosto = TextEditingController(text: widget.pago.costo.toString());
+    controlCosto = TextEditingController(text: widget.pago.costo.toStringAsFixed(2));
     controlFecha = TextEditingController(text: widget.pago.fecha);
     controlUrl = TextEditingController(text: widget.pago.url);
   }
 
   bool validarFormulario() {
-    if (controlNombre.text.isEmpty ||
-        controlCosto.text.isEmpty ||
-        controlFecha.text.isEmpty ||
-        controlUrl.text.isEmpty) {
-      setState(() {
-        msjError = 'Todos los campos son obligatorios.';
-      });
-      return false;
-    }
-    if (!controlUrl.text.startsWith('http://') &&
-        !controlUrl.text.startsWith('https://')) {
-      setState(() {
-        msjError = 'La URL debe empezar con http:// o https://';
-      });
-      return false;
-    }
     setState(() {
-      msjError = '';
+      errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
+      errorFecha = controlFecha.text.isEmpty ? 'Este campo es obligatorio' : null;
+
+      if (controlCosto.text.isEmpty) {
+        errorCosto = 'Este campo es obligatorio';
+      } else if (double.tryParse(controlCosto.text) == null) {
+        errorCosto = 'Ingrese un número, por ejemplo 51.90';
+      } else {
+        errorCosto = null;
+      }
+
+      if (controlUrl.text.isEmpty) {
+        errorUrl = 'Este campo es obligatorio';
+      } else if (!controlUrl.text.startsWith('http://') &&
+          !controlUrl.text.startsWith('https://')) {
+        errorUrl = 'Debe empezar con http:// o https://';
+      } else {
+        errorUrl = null;
+      }
     });
-    return true;
+
+    return errorNombre == null &&
+        errorCosto == null &&
+        errorFecha == null &&
+        errorUrl == null;
   }
 
   Future<void> guardarCambios() async {
     if (!validarFormulario()) return;
 
     final pagoEditado = Pago(
+      id: widget.pago.id,
       nombre: controlNombre.text,
-      costo: double.tryParse(controlCosto.text) ?? 0,
+      costo: double.parse(controlCosto.text),
       fecha: controlFecha.text,
       url: controlUrl.text,
       estado: widget.pago.estado,
     );
 
-    await actualizarPago(widget.indice, pagoEditado);
+    await actualizarPago(widget.pago.id!, pagoEditado);
     if (mounted) Navigator.pop(context);
   }
 
@@ -77,8 +88,24 @@ class _EstadoEditar extends State<PantallaEditar> {
       final dia = fechaElegida.day.toString().padLeft(2, '0');
       final mes = fechaElegida.month.toString().padLeft(2, '0');
       final anio = fechaElegida.year.toString();
-      controlFecha.text = '$anio-$mes-$dia';
+      controlFecha.text = '$dia/$mes/$anio';
     }
+  }
+
+  Widget etiquetaObligatoria(String texto) {
+    return Row(
+      children: [
+        Text(
+          texto,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: colorTexto,
+          ),
+        ),
+        const Text(' *', style: TextStyle(fontSize: 14, color: colorError)),
+      ],
+    );
   }
 
   @override
@@ -94,7 +121,7 @@ class _EstadoEditar extends State<PantallaEditar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar suscripcion'),
+        title: const Text('Editar suscripción'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -107,41 +134,59 @@ class _EstadoEditar extends State<PantallaEditar> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Servicio', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
-                    TextField(controller: controlNombre),
-                    const SizedBox(height: 16),
+                    const Text(
+                      'Datos de la suscripción',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorTexto,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Los campos con * son obligatorios',
+                      style: TextStyle(fontSize: 12, color: colorTextoSuave),
+                    ),
+                    const SizedBox(height: 20),
 
-                    const Text('Costo mensual (Bs)', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
+                    etiquetaObligatoria('Servicio'),
+                    const SizedBox(height: 8),
                     TextField(
-                      controller: controlCosto,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      controller: controlNombre,
+                      decoration: InputDecoration(errorText: errorNombre),
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('Fecha de pago', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
+                    etiquetaObligatoria('Costo mensual (Bs)'),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: controlCosto,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: InputDecoration(errorText: errorCosto),
+                    ),
+                    const SizedBox(height: 16),
+
+                    etiquetaObligatoria('Fecha de pago'),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: controlFecha,
                       readOnly: true,
                       onTap: seleccionarFecha,
-                      decoration: const InputDecoration(
-                        suffixIcon: Icon(Icons.calendar_today, size: 18),
+                      decoration: InputDecoration(
+                        errorText: errorFecha,
+                        suffixIcon: const Icon(Icons.calendar_today, size: 18),
                       ),
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('URL para cancelar', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
-                    TextField(controller: controlUrl, keyboardType: TextInputType.url),
-                    const SizedBox(height: 16),
-
-                    if (msjError.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(msjError, style: const TextStyle(color: Colors.red, fontSize: 14)),
-                      ),
+                    etiquetaObligatoria('URL para cancelar'),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: controlUrl,
+                      keyboardType: TextInputType.url,
+                      decoration: InputDecoration(errorText: errorUrl),
+                    ),
+                    const SizedBox(height: 24),
 
                     SizedBox(
                       width: double.infinity,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../colores.dart';
 import '../modelos/pago.dart';
 import 'pantalla_registro.dart';
 import 'pantalla_detalle.dart';
@@ -60,11 +61,11 @@ class _EstadoLista extends State<PantallaLista> {
     cargarPagos();
   }
 
-  void irADetalle(int indice, Pago pago) async {
+  void irADetalle(Pago pago) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => PantallaDetalle(indice: indice, pago: pago),
+        builder: (ctx) => PantallaDetalle(pago: pago),
       ),
     );
     cargarPagos();
@@ -77,19 +78,24 @@ class _EstadoLista extends State<PantallaLista> {
         title: const Text('Mis Suscripciones'),
       ),
       body: listaPagos.isEmpty
-          ? const Center(child: Text('No hay suscripciones registradas.'))
+          ? const Center(
+              child: Text(
+                'No hay suscripciones registradas.',
+                style: TextStyle(fontSize: 14, color: colorTextoSuave),
+              ),
+            )
           : ListView.builder(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               itemCount: listaPagos.length,
               itemBuilder: (contexto, i) {
                 final pago = listaPagos[i];
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: const EdgeInsets.only(bottom: 14),
                   child: InkWell(
-                    onTap: () => irADetalle(i, pago),
+                    onTap: () => irADetalle(pago),
                     borderRadius: BorderRadius.circular(6),
                     child: Padding(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -98,20 +104,28 @@ class _EstadoLista extends State<PantallaLista> {
                             children: [
                               Text(
                                 pago.nombre,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: colorTexto,
+                                ),
                               ),
                               Text(
                                 'Bs ${pago.costo.toStringAsFixed(2)}',
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: colorTexto,
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           Text(
-                            'Proximo pago: ${calcularProximoPago(pago.fecha)}',
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                            'Próximo pago: ${calcularProximoPago(pago.fecha)}',
+                            style: const TextStyle(fontSize: 12, color: colorTextoSuave),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 16),
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton(
@@ -127,7 +141,7 @@ class _EstadoLista extends State<PantallaLista> {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF444444),
+        backgroundColor: colorAcento,
         onPressed: irARegistro,
         child: const Icon(Icons.add, color: Colors.white),
       ),

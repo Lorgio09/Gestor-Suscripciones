@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
+import '../colores.dart';
 import '../modelos/pago.dart';
 
 class PantallaRegistro extends StatefulWidget {
@@ -14,29 +15,39 @@ class _EstadoRegistro extends State<PantallaRegistro> {
   final controlCosto = TextEditingController();
   final controlFecha = TextEditingController();
   final controlUrl = TextEditingController();
-  String msjError = '';
+
+  String? errorNombre;
+  String? errorCosto;
+  String? errorFecha;
+  String? errorUrl;
 
   bool validarFormulario() {
-    if (controlNombre.text.isEmpty ||
-        controlCosto.text.isEmpty ||
-        controlFecha.text.isEmpty ||
-        controlUrl.text.isEmpty) {
-      setState(() {
-        msjError = 'Todos los campos son obligatorios.';
-      });
-      return false;
-    }
-    if (!controlUrl.text.startsWith('http://') &&
-        !controlUrl.text.startsWith('https://')) {
-      setState(() {
-        msjError = 'La URL debe empezar con http:// o https://';
-      });
-      return false;
-    }
     setState(() {
-      msjError = '';
+      errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
+      errorFecha = controlFecha.text.isEmpty ? 'Este campo es obligatorio' : null;
+
+      if (controlCosto.text.isEmpty) {
+        errorCosto = 'Este campo es obligatorio';
+      } else if (double.tryParse(controlCosto.text) == null) {
+        errorCosto = 'Ingrese un número, por ejemplo 51.90';
+      } else {
+        errorCosto = null;
+      }
+
+      if (controlUrl.text.isEmpty) {
+        errorUrl = 'Este campo es obligatorio';
+      } else if (!controlUrl.text.startsWith('http://') &&
+          !controlUrl.text.startsWith('https://')) {
+        errorUrl = 'Debe empezar con http:// o https://';
+      } else {
+        errorUrl = null;
+      }
     });
-    return true;
+
+    return errorNombre == null &&
+        errorCosto == null &&
+        errorFecha == null &&
+        errorUrl == null;
   }
 
   Future<void> guardarNuevoPago() async {
@@ -44,7 +55,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
 
     final nuevoPago = Pago(
       nombre: controlNombre.text,
-      costo: double.tryParse(controlCosto.text) ?? 0,
+      costo: double.parse(controlCosto.text),
       fecha: controlFecha.text,
       url: controlUrl.text,
     );
@@ -64,8 +75,24 @@ class _EstadoRegistro extends State<PantallaRegistro> {
       final dia = fechaElegida.day.toString().padLeft(2, '0');
       final mes = fechaElegida.month.toString().padLeft(2, '0');
       final anio = fechaElegida.year.toString();
-      controlFecha.text = '$dia-$mes-$anio';
+      controlFecha.text = '$dia/$mes/$anio';
     }
+  }
+
+  Widget etiquetaObligatoria(String texto) {
+    return Row(
+      children: [
+        Text(
+          texto,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: colorTexto,
+          ),
+        ),
+        const Text(' *', style: TextStyle(fontSize: 14, color: colorError)),
+      ],
+    );
   }
 
   @override
@@ -94,50 +121,69 @@ class _EstadoRegistro extends State<PantallaRegistro> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Servicio', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
+                    const Text(
+                      'Datos de la suscripción',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorTexto,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Los campos con * son obligatorios',
+                      style: TextStyle(fontSize: 12, color: colorTextoSuave),
+                    ),
+                    const SizedBox(height: 20),
+
+                    etiquetaObligatoria('Servicio'),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: controlNombre,
-                      decoration: const InputDecoration(hintText: 'Ej.: Netflix, Spotify, Tigo Hogar'),
+                      decoration: InputDecoration(
+                        hintText: 'Ej.: Netflix, Spotify, Tigo Hogar',
+                        errorText: errorNombre,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('Costo mensual (Bs)', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
+                    etiquetaObligatoria('Costo mensual (Bs)'),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: controlCosto,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(hintText: 'Ej.: 51.90'),
+                      decoration: InputDecoration(
+                        hintText: 'Ej.: 51.90',
+                        errorText: errorCosto,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('Fecha de pago', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
+                    etiquetaObligatoria('Fecha de pago'),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: controlFecha,
                       readOnly: true,
                       onTap: seleccionarFecha,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'dd/mm/aaaa',
-                        suffixIcon: Icon(Icons.calendar_today, size: 18),
+                        errorText: errorFecha,
+                        suffixIcon: const Icon(Icons.calendar_today, size: 18),
                       ),
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('URL para cancelar', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                    const SizedBox(height: 6),
+                    etiquetaObligatoria('URL para cancelar'),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: controlUrl,
                       keyboardType: TextInputType.url,
-                      decoration: const InputDecoration(hintText: 'https://...'),
-                    ),
-                    const SizedBox(height: 16),
-
-                    if (msjError.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(msjError, style: const TextStyle(color: Colors.red, fontSize: 14)),
+                      decoration: InputDecoration(
+                        hintText: 'https://...',
+                        errorText: errorUrl,
                       ),
+                    ),
+                    const SizedBox(height: 24),
 
                     SizedBox(
                       width: double.infinity,
