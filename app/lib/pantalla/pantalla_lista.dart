@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../colores.dart';
+import '../formato.dart';
 import '../modelos/pago.dart';
+import '../tipografia.dart';
 import 'pantalla_registro.dart';
 import 'pantalla_detalle.dart';
 
@@ -29,30 +30,6 @@ class _EstadoLista extends State<PantallaLista> {
     });
   }
 
-  void abrirUrl(String url) async {
-    final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
-  String calcularProximoPago(String fecha) {
-    final partes = fecha.split('/');
-    if (partes.length != 3) return fecha;
-
-    int dia = int.parse(partes[0]);
-    int mes = int.parse(partes[1]);
-    int anio = int.parse(partes[2]);
-
-    mes = mes + 1;
-    if (mes > 12) {
-      mes = 1;
-      anio = anio + 1;
-    }
-
-    final diaStr = dia.toString().padLeft(2, '0');
-    final mesStr = mes.toString().padLeft(2, '0');
-    return '$diaStr/$mesStr/$anio';
-  }
-
   void irARegistro() async {
     await Navigator.push(
       context,
@@ -71,79 +48,103 @@ class _EstadoLista extends State<PantallaLista> {
     cargarPagos();
   }
 
+  Widget armarTarjeta(Pago pago) {
+    final proximo = calcularProximoPago(pago.fecha);
+    final colorVencimiento = estaPorVencer(proximo) ? colorPorVencer : colorSecundario;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        onTap: () => irADetalle(pago),
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colorPorNombre(pago.nombre),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(inicialDe(pago.nombre), style: estiloInicial),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(pago.nombre, style: estiloNombreServicio),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Vence el ${fechaCorta(proximo)}',
+                      style: estiloSecundario.copyWith(color: colorVencimiento),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('Bs ${pago.costo.toStringAsFixed(2)}', style: estiloValorDato),
+                  const SizedBox(height: 8),
+                  Text('/mes', style: estiloSecundario),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mis Suscripciones'),
-      ),
-      body: listaPagos.isEmpty
-          ? const Center(
-              child: Text(
-                'No hay suscripciones registradas.',
-                style: TextStyle(fontSize: 14, color: colorTextoSuave),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: listaPagos.length,
-              itemBuilder: (contexto, i) {
-                final pago = listaPagos[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 14),
-                  child: InkWell(
-                    onTap: () => irADetalle(pago),
-                    borderRadius: BorderRadius.circular(6),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                pago.nombre,
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                  color: colorTexto,
-                                ),
-                              ),
-                              Text(
-                                'Bs ${pago.costo.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                  color: colorTexto,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Próximo pago: ${calcularProximoPago(pago.fecha)}',
-                            style: const TextStyle(fontSize: 12, color: colorTextoSuave),
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: () => abrirUrl(pago.url),
-                              child: const Text('Ir a pagar'),
-                            ),
-                          ),
-                        ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              Text('Mis suscripciones', style: estiloTituloPantalla),
+              const SizedBox(height: 24),
+              Expanded(
+                child: listaPagos.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No hay suscripciones registradas.',
+                          style: estiloSecundario,
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: listaPagos.length,
+                        itemBuilder: (contexto, i) => armarTarjeta(listaPagos[i]),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: colorAcento,
-        onPressed: irARegistro,
-        child: const Icon(Icons.add, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 16, bottom: 16),
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: FloatingActionButton(
+            backgroundColor: colorMarca,
+            splashColor: colorMarcaPresionado,
+            elevation: 0,
+            shape: const CircleBorder(),
+            onPressed: irARegistro,
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ),
       ),
     );
   }
