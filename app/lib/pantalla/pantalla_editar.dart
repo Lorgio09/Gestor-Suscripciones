@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
 import '../colores.dart';
 import '../modelos/pago.dart';
+import '../tipografia.dart';
+import 'encabezado.dart';
 
 class PantallaEditar extends StatefulWidget {
   final Pago pago;
@@ -95,15 +97,8 @@ class _EstadoEditar extends State<PantallaEditar> {
   Widget etiquetaObligatoria(String texto) {
     return Row(
       children: [
-        Text(
-          texto,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: colorTexto,
-          ),
-        ),
-        const Text(' *', style: TextStyle(fontSize: 14, color: colorError)),
+        Text(texto, style: estiloEtiquetaCampo),
+        Text(' *', style: estiloEtiquetaCampo.copyWith(color: colorError)),
       ],
     );
   }
@@ -120,85 +115,85 @@ class _EstadoEditar extends State<PantallaEditar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Editar suscripción'),
-      ),
-      body: Center(
+      body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Datos de la suscripción',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: colorTexto,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Los campos con * son obligatorios',
-                      style: TextStyle(fontSize: 12, color: colorTextoSuave),
-                    ),
-                    const SizedBox(height: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              Encabezado(titulo: 'Editar suscripción'),
+              const SizedBox(height: 24),
 
-                    etiquetaObligatoria('Servicio'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controlNombre,
-                      decoration: InputDecoration(errorText: errorNombre),
-                    ),
-                    const SizedBox(height: 16),
-
-                    etiquetaObligatoria('Costo mensual (Bs)'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controlCosto,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(errorText: errorCosto),
-                    ),
-                    const SizedBox(height: 16),
-
-                    etiquetaObligatoria('Fecha de pago'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controlFecha,
-                      readOnly: true,
-                      onTap: seleccionarFecha,
-                      decoration: InputDecoration(
-                        errorText: errorFecha,
-                        suffixIcon: const Icon(Icons.calendar_today, size: 18),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    etiquetaObligatoria('URL para cancelar'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controlUrl,
-                      keyboardType: TextInputType.url,
-                      decoration: InputDecoration(errorText: errorUrl),
-                    ),
-                    const SizedBox(height: 24),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: guardarCambios,
-                        child: const Text('Guardar cambios'),
-                      ),
-                    ),
-                  ],
+              etiquetaObligatoria('Servicio'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controlNombre,
+                style: estiloTextoCampo,
+                decoration: InputDecoration(
+                  hintText: 'Ej. Netflix',
+                  errorText: errorNombre,
+                  prefixIcon: const Icon(Icons.local_offer_outlined,
+                      size: 16, color: colorSecundario),
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
+
+              etiquetaObligatoria('Costo mensual'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controlCosto,
+                style: estiloTextoCampo,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  hintText: '0.00',
+                  prefixText: 'Bs  ',
+                  errorText: errorCosto,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              etiquetaObligatoria('Fecha de pago'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controlFecha,
+                style: estiloTextoCampo,
+                readOnly: true,
+                onTap: seleccionarFecha,
+                decoration: InputDecoration(
+                  hintText: 'DD / MM / AAAA',
+                  errorText: errorFecha,
+                  prefixIcon: const Icon(Icons.calendar_today_outlined,
+                      size: 16, color: colorSecundario),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              etiquetaObligatoria('URL para cancelar'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controlUrl,
+                style: estiloTextoCampo,
+                keyboardType: TextInputType.url,
+                decoration: InputDecoration(
+                  hintText: 'https://...',
+                  errorText: errorUrl,
+                  prefixIcon: const Icon(Icons.link,
+                      size: 16, color: colorSecundario),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: guardarCambios,
+                  icon: const Icon(Icons.check, size: 16),
+                  label: const Text('Guardar cambios'),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),

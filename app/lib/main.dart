@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'colores.dart';
+import 'tipografia.dart';
 import 'pantalla/pantalla_lista.dart';
 
 void main() {
@@ -25,73 +26,72 @@ class MiApp extends StatelessWidget {
       ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: colorAcento,
+          seedColor: colorMarca,
           brightness: Brightness.light,
         ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFEEEEEE),
-          foregroundColor: colorTexto,
-          elevation: 0,
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        fontFamily: fuenteInterfaz,
+        scaffoldBackgroundColor: colorFondo,
         cardTheme: const CardThemeData(
           color: Colors.white,
           elevation: 0,
+          margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             side: BorderSide(color: colorBorde),
-            borderRadius: BorderRadius.all(Radius.circular(6)),
+            borderRadius: BorderRadius.all(Radius.circular(14)),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          hintStyle: estiloSecundario,
+          prefixStyle: estiloSecundario,
+          errorStyle: armarEstilo(fuenteInterfaz, 16, 400, colorError),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: colorBordeCampo),
+            borderRadius: BorderRadius.circular(11),
+            borderSide: const BorderSide(color: colorBorde),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: colorBordeCampo),
+            borderRadius: BorderRadius.circular(11),
+            borderSide: const BorderSide(color: colorBorde),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: colorAcento, width: 2),
+            borderRadius: BorderRadius.circular(11),
+            borderSide: const BorderSide(color: colorMarca),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(11),
             borderSide: const BorderSide(color: colorError),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: colorError, width: 2),
+            borderRadius: BorderRadius.circular(11),
+            borderSide: const BorderSide(color: colorError),
           ),
-          errorStyle: const TextStyle(color: colorError, fontSize: 12),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorAcento,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.resolveWith((estados) {
+              if (estados.contains(WidgetState.pressed)) return colorMarcaPresionado;
+              return colorMarca;
+            }),
+            foregroundColor: WidgetStateProperty.all(Colors.white),
+            elevation: WidgetStateProperty.all(0),
+            textStyle: WidgetStateProperty.all(estiloBoton),
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(vertical: 15),
+            ),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: colorTexto,
-            side: const BorderSide(color: colorBordeCampo),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            backgroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            textStyle: estiloNombreServicio,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: colorTexto,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
