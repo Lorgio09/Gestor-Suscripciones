@@ -76,9 +76,9 @@ class _EstadoRegistro extends State<PantallaRegistro> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colores.primario, // Cambia el color principal del calendario al Coral
-              onPrimary: Colors.white, // El texto sobre el Coral será blanco
-              onSurface: Colores.textoPrincipal, // El texto normal de los días
+              primary: Colores.primario, 
+              onPrimary: Colors.white, 
+              onSurface: Colores.textoPrincipal, 
             ),
           ),
           child: child!,

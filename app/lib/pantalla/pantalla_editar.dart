@@ -89,7 +89,7 @@ class _EstadoEditar extends State<PantallaEditar> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colores.primario, // Cambia el color del calendario al Coral
+              primary: Colores.primario, 
               onPrimary: Colors.white,
               onSurface: Colores.textoPrincipal,
             ),

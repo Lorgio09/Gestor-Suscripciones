@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 import '../colores.dart';
 import '../tipografia.dart';
+import 'pantalla_registro.dart';
 import 'pantalla_lista.dart';
+import 'pantalla_crear_cuenta.dart';
 
-class PantallaCrearCuenta extends StatefulWidget {
-  const PantallaCrearCuenta({super.key});
+class PantallaIniciarSesion extends StatefulWidget {
+  const PantallaIniciarSesion({super.key});
 
   @override
-  State<PantallaCrearCuenta> createState() => _PantallaCrearCuentaState();
+  State<PantallaIniciarSesion> createState() => _EstadoIniciarSesion();
 }
 
-class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
+class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
   bool _ocultarPassword = true;
-
+  String? errorDatos;
+  
   Widget _construirEtiqueta(String texto) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0), 
-      child: RichText(
-        text: TextSpan(
-          text: texto,
-          style: Tipografia.etiqueta,
-          children: const [
-            TextSpan(
-              text: ' *',
-              style: TextStyle(color: Colores.error),
-            ),
-          ],
-        ),
-      ),
+    return Row(
+      children: [
+        Text(texto, style: Tipografia.etiqueta),
+        Text(' *', style: Tipografia.etiqueta.copyWith(color: Colores.error)),
+      ],
     );
   }
 
@@ -36,7 +30,7 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0), 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -52,7 +46,7 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                   ),
                   child: const Icon(
                     Icons.refresh, 
-                    color: Colors.white,
+                    color: Colores.superficie, 
                     size: 28,
                   ),
                 ),
@@ -60,26 +54,24 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
               
               const SizedBox(height: 16), 
               
+              // Título
               const Text(
-                'Crear cuenta',
+                'Iniciar sesión',
                 style: Tipografia.titulo1,
                 textAlign: TextAlign.center,
               ),
               
-              const SizedBox(height: 24), 
+              const SizedBox(height: 8), 
               
-              _construirEtiqueta('Nombre'),
-              TextFormField(
-                style: Tipografia.textoCampo,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.person, color: Colores.textoSecundario, size: 20),
-                  hintText: 'Princesa',
-                ),
+              Text(
+                'Entrá para ver tus suscripciones',
+                style: Tipografia.textoCampo.copyWith(color: Colores.textoSecundario),
+                textAlign: TextAlign.center,
               ),
               
-              const SizedBox(height: 16), 
-              
+              const SizedBox(height: 24), 
               _construirEtiqueta('Correo'),
+              const SizedBox(height: 8),
               TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 style: Tipografia.textoCampo,
@@ -90,12 +82,12 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
               ),
               
               const SizedBox(height: 16), 
-
+              
               _construirEtiqueta('Contraseña'),
+              const SizedBox(height: 8),
               TextFormField(
                 obscureText: _ocultarPassword,
                 style: Tipografia.textoCampo,
-
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outline, color: Colores.textoSecundario, size: 20),
                   suffixIcon: IconButton(
@@ -110,50 +102,56 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                       });
                     },
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(11),
-                    borderSide: const BorderSide(color: Colores.error),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(11),
-                    borderSide: const BorderSide(color: Colores.error),
-                  ),
+                  errorText: errorDatos, 
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              SizedBox(
+                height: 51,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PantallaLista()),
+                    );
+                  },
+                  child: const Text('Iniciar sesión'),
                 ),
               ),
               
               const SizedBox(height: 8), 
               
-              const Text(
-                'Mínimo 6 caracteres · llevás 4',
-                style: Tipografia.textoAyuda,
-              ),
-              
-              const SizedBox(height: 24), 
-              
               SizedBox(
-                height: 51, 
-                child: ElevatedButton(
+                height: 47,
+                child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
+
+                    Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const PantallaLista()),
-                      (route) => false,
+                      MaterialPageRoute(builder: (context) => const PantallaCrearCuenta()),
                     );
-                  }, 
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colores.primario,
+                    side: const BorderSide(color: Colores.primario),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
                   child: const Text('Crear cuenta'),
                 ),
               ),
               
               const SizedBox(height: 16), 
+              
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colores.primario,
                   textStyle: Tipografia.etiqueta, 
                 ),
-                child: const Text('Ya tengo cuenta'),
+                child: const Text('¿Olvidaste tu contraseña?'),
               ),
               
               const SizedBox(height: 24), 

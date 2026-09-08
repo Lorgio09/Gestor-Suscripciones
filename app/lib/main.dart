@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'colores.dart'; 
 import 'tipografia.dart'; 
 import 'pantalla/pantalla_lista.dart';
+import 'pantalla/pantalla_carga.dart';
 
 void main() {
   runApp(const MiApp());
@@ -81,12 +82,12 @@ class MiApp extends StatelessWidget {
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.resolveWith((estados) {
               if (estados.contains(WidgetState.disabled)) return Colores.botonDeshabilitado;
-              if (estados.contains(WidgetState.pressed)) return const Color(0xFFE8532F); 
+              if (estados.contains(WidgetState.pressed)) return Colores.primario; 
               return Colores.primario;
             }),
             foregroundColor: WidgetStateProperty.resolveWith((estados) {
               if (estados.contains(WidgetState.disabled)) return Colores.textoDeshabilitado;
-              return Colors.white;
+              return Colores.superficie; 
             }),
             elevation: WidgetStateProperty.all(0),
             textStyle: WidgetStateProperty.all(Tipografia.textoBoton),
@@ -110,7 +111,7 @@ class MiApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const PantallaLista(),
+      home: const PantallaCarga(),
     );
   }
 }
