@@ -62,10 +62,10 @@ class _EstadoPantallaCarga extends State<PantallaCarga> {
                 height: 72,
                 decoration: BoxDecoration(
                   color: Colores.superficie.withOpacity(0.22),
-                  borderRadius: BorderRadius.circular(20),
+                  shape: BoxShape.circle, 
                 ),
                 child: const Icon(
-                  Icons.refresh,
+                  Icons.sync,
                   color: Colores.superficie,
                   size: 36,
                 ),

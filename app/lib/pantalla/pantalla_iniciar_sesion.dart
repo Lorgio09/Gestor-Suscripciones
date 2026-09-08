@@ -41,12 +41,12 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
                 child: Container(
                   width: 56,
                   height: 56,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colores.primario,
-                    borderRadius: BorderRadius.circular(16),
+                    shape: BoxShape.circle, 
                   ),
                   child: const Icon(
-                    Icons.refresh, 
+                    Icons.sync, 
                     color: Colores.superficie, 
                     size: 28,
                   ),
