@@ -8,6 +8,13 @@ import '../tipografia.dart';
 import 'encabezado.dart';
 import 'pantalla_editar.dart';
 
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../colores.dart';
+import '../tipografia.dart';
+import 'encabezado.dart';
+// import '../modelos/pago.dart'; 
+
 class PantallaDetalle extends StatefulWidget {
   final Pago pago;
 
@@ -58,16 +65,16 @@ class _EstadoDetalle extends State<PantallaDetalle> {
     showDialog(
       context: context,
       builder: (contexto) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: Text('Eliminar suscripción', style: estiloEncabezado),
+        backgroundColor: Colores.superficie, 
+        title: const Text('Eliminar suscripción', style: Tipografia.titulo1),
         content: Text(
           '¿Eliminar "${pago.nombre}"? Esta acción no se puede deshacer.',
-          style: estiloTextoCampo,
+          style: Tipografia.textoCampo,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(contexto),
-            child: Text('Cancelar', style: estiloSecundario),
+            child: const Text('Cancelar', style: Tipografia.textoAyuda),
           ),
           TextButton(
             onPressed: () async {
@@ -77,7 +84,7 @@ class _EstadoDetalle extends State<PantallaDetalle> {
             },
             child: Text(
               'Eliminar',
-              style: estiloNombreServicio.copyWith(color: colorError),
+              style: Tipografia.etiqueta.copyWith(color: Colores.error),
             ),
           ),
         ],
@@ -88,14 +95,14 @@ class _EstadoDetalle extends State<PantallaDetalle> {
   Widget tarjetaDato(IconData icono, String etiqueta, String valor) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16), 
         child: Row(
           children: [
-            Icon(icono, size: 16, color: colorSecundario),
-            const SizedBox(width: 8),
-            Text(etiqueta, style: estiloTextoCampo),
+            Icon(icono, size: 16, color: Colores.textoSecundario),
+            const SizedBox(width: 8), 
+            Text(etiqueta, style: Tipografia.textoCampo),
             const Spacer(),
-            Text(valor, style: estiloValorDato),
+            Text(valor, style: Tipografia.numerico), 
           ],
         ),
       ),
@@ -111,8 +118,8 @@ class _EstadoDetalle extends State<PantallaDetalle> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24),
-              Encabezado(titulo: 'Detalle'),
+              const SizedBox(height: 24), 
+              const Encabezado(titulo: 'Detalle'), 
               const SizedBox(height: 24),
 
               Center(
@@ -123,15 +130,21 @@ class _EstadoDetalle extends State<PantallaDetalle> {
                       height: 64,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: colorPorNombre(pago.nombre),
+                        color: Colores.primario, 
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: Text(inicialDe(pago.nombre), style: estiloInicialGrande),
+                      child: Text(
+                        inicialDe(pago.nombre),
+                        style: Tipografia.titulo1.copyWith(
+                          color: Colors.white, 
+                          fontSize: 32, 
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    Text(pago.nombre, style: estiloEncabezado),
+                    Text(pago.nombre, style: Tipografia.titulo1),
                     const SizedBox(height: 8),
-                    Text(textoEstado(), style: estiloSecundario),
+                    Text(textoEstado(), style: Tipografia.textoAyuda),
                   ],
                 ),
               ),
@@ -146,7 +159,7 @@ class _EstadoDetalle extends State<PantallaDetalle> {
               tarjetaDato(
                 Icons.calendar_today,
                 'Próximo pago',
-                calcularProximoPago(pago.fecha),
+                calcularProximoPago(pago.fecha), 
               ),
               const SizedBox(height: 24),
 
@@ -168,8 +181,8 @@ class _EstadoDetalle extends State<PantallaDetalle> {
                       icon: const Icon(Icons.edit_outlined, size: 16),
                       label: const Text('Editar'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: colorMarca,
-                        side: const BorderSide(color: colorMarca),
+                        foregroundColor: Colores.primario,
+                        side: const BorderSide(color: Colores.primario),
                       ),
                     ),
                   ),
@@ -180,8 +193,8 @@ class _EstadoDetalle extends State<PantallaDetalle> {
                       icon: const Icon(Icons.delete_outline, size: 16),
                       label: const Text('Eliminar'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: colorError,
-                        side: const BorderSide(color: colorError),
+                        foregroundColor: Colores.error,
+                        side: const BorderSide(color: Colores.error),
                       ),
                     ),
                   ),

@@ -12,11 +12,20 @@ String inicialDe(String nombre) {
 }
 
 Color colorPorNombre(String nombre) {
+  final List<Color> paletaAvatares = [
+    Colores.primario,    
+    Colores.secundario, 
+    Colores.error,  
+    Colores.textoSecundario, 
+    Colores.textoPrincipal, 
+  ];
+
   int suma = 0;
   for (int i = 0; i < nombre.length; i++) {
     suma = suma + nombre.codeUnitAt(i);
   }
-  return coloresIniciales[suma % coloresIniciales.length];
+  
+  return paletaAvatares[suma % paletaAvatares.length];
 }
 
 String calcularProximoPago(String fecha) {

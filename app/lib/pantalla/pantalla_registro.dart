@@ -72,6 +72,18 @@ class _EstadoRegistro extends State<PantallaRegistro> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colores.primario, // Cambia el color principal del calendario al Coral
+              onPrimary: Colors.white, // El texto sobre el Coral será blanco
+              onSurface: Colores.textoPrincipal, // El texto normal de los días
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (fechaElegida != null) {
       final dia = fechaElegida.day.toString().padLeft(2, '0');
@@ -84,8 +96,8 @@ class _EstadoRegistro extends State<PantallaRegistro> {
   Widget etiquetaObligatoria(String texto) {
     return Row(
       children: [
-        Text(texto, style: estiloEtiquetaCampo),
-        Text(' *', style: estiloEtiquetaCampo.copyWith(color: colorError)),
+        Text(texto, style: Tipografia.etiqueta),
+        Text(' *', style: Tipografia.etiqueta.copyWith(color: Colores.error)),
       ],
     );
   }
@@ -109,19 +121,19 @@ class _EstadoRegistro extends State<PantallaRegistro> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              Encabezado(titulo: 'Registrar pago'),
+              const Encabezado(titulo: 'Registrar pago'),
               const SizedBox(height: 24),
 
               etiquetaObligatoria('Servicio'),
               const SizedBox(height: 8),
               TextField(
                 controller: controlNombre,
-                style: estiloTextoCampo,
+                style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   hintText: 'Ej. Netflix',
                   errorText: errorNombre,
                   prefixIcon: const Icon(Icons.local_offer_outlined,
-                      size: 16, color: colorSecundario),
+                      size: 16, color: Colores.textoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -130,7 +142,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               const SizedBox(height: 8),
               TextField(
                 controller: controlCosto,
-                style: estiloTextoCampo,
+                style: Tipografia.textoCampo,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   hintText: '0.00',
@@ -144,14 +156,14 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               const SizedBox(height: 8),
               TextField(
                 controller: controlFecha,
-                style: estiloTextoCampo,
+                style: Tipografia.textoCampo,
                 readOnly: true,
                 onTap: seleccionarFecha,
                 decoration: InputDecoration(
                   hintText: 'DD / MM / AAAA',
                   errorText: errorFecha,
                   prefixIcon: const Icon(Icons.calendar_today_outlined,
-                      size: 16, color: colorSecundario),
+                      size: 16, color: Colores.textoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -160,13 +172,13 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               const SizedBox(height: 8),
               TextField(
                 controller: controlUrl,
-                style: estiloTextoCampo,
+                style: Tipografia.textoCampo,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(
                   hintText: 'https://...',
                   errorText: errorUrl,
                   prefixIcon: const Icon(Icons.link,
-                      size: 16, color: colorSecundario),
+                      size: 16, color: Colores.textoSecundario),
                 ),
               ),
               const SizedBox(height: 24),

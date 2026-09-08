@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'colores.dart';
-import 'tipografia.dart';
+import 'colores.dart'; 
+import 'tipografia.dart'; 
 import 'pantalla/pantalla_lista.dart';
 
 void main() {
@@ -22,61 +22,74 @@ class MiApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
+        Locale('es', 'BO'), 
         Locale('es', 'ES'),
       ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: colorMarca,
+          seedColor: Colores.primario,
           brightness: Brightness.light,
         ),
-        fontFamily: fuenteInterfaz,
-        scaffoldBackgroundColor: colorFondo,
+        fontFamily: 'PlusJakartaSans', 
+        scaffoldBackgroundColor: Colores.fondo,
+        
         cardTheme: const CardThemeData(
-          color: Colors.white,
+          color: Colores.superficie,
           elevation: 0,
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: colorBorde),
+            side: BorderSide(color: Colores.borde),
             borderRadius: BorderRadius.all(Radius.circular(14)),
           ),
         ),
+        
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Colores.superficie,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          hintStyle: estiloSecundario,
-          prefixStyle: estiloSecundario,
-          errorStyle: armarEstilo(fuenteInterfaz, 16, 400, colorError),
+          hintStyle: Tipografia.textoAyuda,
+          prefixStyle: Tipografia.textoAyuda,
+          errorStyle: const TextStyle(
+            fontFamily: 'PlusJakartaSans',
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Colores.error,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: colorBorde),
+            borderSide: const BorderSide(color: Colores.borde),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: colorBorde),
+            borderSide: const BorderSide(color: Colores.borde),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: colorMarca),
+            borderSide: const BorderSide(color: Colores.primario),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: colorError),
+            borderSide: const BorderSide(color: Colores.error),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: colorError),
+            borderSide: const BorderSide(color: Colores.error),
           ),
         ),
+        
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.resolveWith((estados) {
-              if (estados.contains(WidgetState.pressed)) return colorMarcaPresionado;
-              return colorMarca;
+              if (estados.contains(WidgetState.disabled)) return Colores.botonDeshabilitado;
+              if (estados.contains(WidgetState.pressed)) return const Color(0xFFE8532F); 
+              return Colores.primario;
             }),
-            foregroundColor: WidgetStateProperty.all(Colors.white),
+            foregroundColor: WidgetStateProperty.resolveWith((estados) {
+              if (estados.contains(WidgetState.disabled)) return Colores.textoDeshabilitado;
+              return Colors.white;
+            }),
             elevation: WidgetStateProperty.all(0),
-            textStyle: WidgetStateProperty.all(estiloBoton),
+            textStyle: WidgetStateProperty.all(Tipografia.textoBoton),
             padding: WidgetStateProperty.all(
               const EdgeInsets.symmetric(vertical: 15),
             ),
@@ -85,11 +98,12 @@ class MiApp extends StatelessWidget {
             ),
           ),
         ),
+        
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.white,
+            backgroundColor: Colores.superficie,
             padding: const EdgeInsets.symmetric(vertical: 13),
-            textStyle: estiloNombreServicio,
+            textStyle: Tipografia.etiqueta,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),

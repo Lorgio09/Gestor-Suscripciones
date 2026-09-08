@@ -24,7 +24,7 @@ class _EstadoLista extends State<PantallaLista> {
   }
 
   Future<void> cargarPagos() async {
-    final datos = await leerPagos();
+    final datos = await leerPagos(); 
     setState(() {
       listaPagos = datos;
     });
@@ -50,13 +50,13 @@ class _EstadoLista extends State<PantallaLista> {
 
   Widget armarTarjeta(Pago pago) {
     final proximo = calcularProximoPago(pago.fecha);
-    final colorVencimiento = estaPorVencer(proximo) ? colorPorVencer : colorSecundario;
+    final colorVencimiento = estaPorVencer(proximo) ? Colores.error : Colores.textoSecundario;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: () => irADetalle(pago),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14), 
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -66,21 +66,27 @@ class _EstadoLista extends State<PantallaLista> {
                 height: 44,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorPorNombre(pago.nombre),
+                  color: Colores.primario, 
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(inicialDe(pago.nombre), style: estiloInicial),
+                child: Text(
+                  inicialDe(pago.nombre), 
+                  style: Tipografia.titulo1.copyWith(color: Colores.superficie, fontSize: 20),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(pago.nombre, style: estiloNombreServicio),
+                    Text(
+                      pago.nombre, 
+                      style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'Vence el ${fechaCorta(proximo)}',
-                      style: estiloSecundario.copyWith(color: colorVencimiento),
+                      style: Tipografia.textoAyuda.copyWith(color: colorVencimiento),
                     ),
                   ],
                 ),
@@ -89,9 +95,9 @@ class _EstadoLista extends State<PantallaLista> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Bs ${pago.costo.toStringAsFixed(2)}', style: estiloValorDato),
+                  Text('Bs ${pago.costo.toStringAsFixed(2)}', style: Tipografia.numerico),
                   const SizedBox(height: 8),
-                  Text('/mes', style: estiloSecundario),
+                  Text('/mes', style: Tipografia.textoAyuda),
                 ],
               ),
             ],
@@ -111,14 +117,14 @@ class _EstadoLista extends State<PantallaLista> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              Text('Mis suscripciones', style: estiloTituloPantalla),
+              const Text('Mis suscripciones', style: Tipografia.titulo1),
               const SizedBox(height: 24),
               Expanded(
                 child: listaPagos.isEmpty
-                    ? Center(
+                    ? const Center(
                         child: Text(
                           'No hay suscripciones registradas.',
-                          style: estiloSecundario,
+                          style: Tipografia.textoAyuda,
                         ),
                       )
                     : ListView.builder(
@@ -137,12 +143,11 @@ class _EstadoLista extends State<PantallaLista> {
           width: 56,
           height: 56,
           child: FloatingActionButton(
-            backgroundColor: colorMarca,
-            splashColor: colorMarcaPresionado,
+            backgroundColor: Colores.primario,
             elevation: 0,
             shape: const CircleBorder(),
             onPressed: irARegistro,
-            child: const Icon(Icons.add, color: Colors.white),
+            child: const Icon(Icons.add, color: Colores.superficie),
           ),
         ),
       ),
