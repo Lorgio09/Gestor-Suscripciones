@@ -17,7 +17,23 @@ class Colores {
   static const Color fondo = Color(0xFFF6EFEC); 
   static const Color borde = Color(0xFFEADFDA); 
   
-  // Estados deshabilitados (Botones)
   static const Color botonDeshabilitado = Color(0xFFF3EDEA);
   static const Color textoDeshabilitado = Color(0xFFB5A8A3);
+
+
+  static const Color degradado1 = Color(0xFFF05E3F); 
+  static const Color degradado2 = Color(0xFFE83716);
+  static const Color degradado3 = Color(0xFFCA3D27); 
+
+  // Degradado junto
+  static const LinearGradient degradadoFondo = LinearGradient(
+    begin: Alignment.topCenter, 
+    end: Alignment.bottomCenter, 
+    stops: [0.13, 0.38, 0.77], 
+    colors: [
+      degradado1,
+      degradado2,
+      degradado3,
+    ],
+  );
 }

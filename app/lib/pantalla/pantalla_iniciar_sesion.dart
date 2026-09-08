@@ -4,6 +4,7 @@ import '../tipografia.dart';
 import 'pantalla_registro.dart';
 import 'pantalla_lista.dart';
 import 'pantalla_crear_cuenta.dart';
+import 'pantalla_recuperar_contrasena.dart';
 
 class PantallaIniciarSesion extends StatefulWidget {
   const PantallaIniciarSesion({super.key});
@@ -127,7 +128,6 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
                 height: 47,
                 child: OutlinedButton(
                   onPressed: () {
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const PantallaCrearCuenta()),
@@ -146,6 +146,13 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
               
               TextButton(
                 onPressed: () {
+                  // Navega a la pantalla de Recuperar Contraseña
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PantallaRecuperarContrasena(),
+                    ),
+                  );
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colores.primario,

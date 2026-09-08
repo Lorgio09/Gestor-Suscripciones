@@ -22,6 +22,25 @@ class _EstadoRegistro extends State<PantallaRegistro> {
   String? errorCosto;
   String? errorFecha;
   String? errorUrl;
+  @override
+  void initState() {
+    super.initState();
+    controlNombre.addListener(_actualizarPantalla);
+    controlCosto.addListener(_actualizarPantalla);
+    controlFecha.addListener(_actualizarPantalla);
+    controlUrl.addListener(_actualizarPantalla);
+  }
+
+  void _actualizarPantalla() {
+    setState(() {}); 
+  }
+
+  bool get _camposCompletos {
+    return controlNombre.text.isNotEmpty &&
+           controlCosto.text.isNotEmpty &&
+           controlFecha.text.isNotEmpty &&
+           controlUrl.text.isNotEmpty;
+  }
 
   bool validarFormulario() {
     setState(() {
@@ -104,6 +123,11 @@ class _EstadoRegistro extends State<PantallaRegistro> {
 
   @override
   void dispose() {
+    controlNombre.removeListener(_actualizarPantalla);
+    controlCosto.removeListener(_actualizarPantalla);
+    controlFecha.removeListener(_actualizarPantalla);
+    controlUrl.removeListener(_actualizarPantalla);
+    
     controlNombre.dispose();
     controlCosto.dispose();
     controlFecha.dispose();
@@ -132,8 +156,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
                 decoration: InputDecoration(
                   hintText: 'Ej. Netflix',
                   errorText: errorNombre,
-                  prefixIcon: const Icon(Icons.local_offer_outlined,
-                      size: 16, color: Colores.textoSecundario),
+                  prefixIcon: const Icon(Icons.local_offer_outlined, size: 16, color: Colores.textoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -162,8 +185,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
                 decoration: InputDecoration(
                   hintText: 'DD / MM / AAAA',
                   errorText: errorFecha,
-                  prefixIcon: const Icon(Icons.calendar_today_outlined,
-                      size: 16, color: Colores.textoSecundario),
+                  prefixIcon: const Icon(Icons.calendar_today_outlined, size: 16, color: Colores.textoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -177,8 +199,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
                 decoration: InputDecoration(
                   hintText: 'https://...',
                   errorText: errorUrl,
-                  prefixIcon: const Icon(Icons.link,
-                      size: 16, color: Colores.textoSecundario),
+                  prefixIcon: const Icon(Icons.link, size: 16, color: Colores.textoSecundario),
                 ),
               ),
               const SizedBox(height: 24),
@@ -186,7 +207,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: guardarNuevoPago,
+                  onPressed: _camposCompletos ? guardarNuevoPago : null,
                   icon: const Icon(Icons.check, size: 16),
                   label: const Text('Guardar pago'),
                 ),
