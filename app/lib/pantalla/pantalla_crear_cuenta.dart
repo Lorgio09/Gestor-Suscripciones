@@ -48,11 +48,11 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                   height: 56,
                   decoration: BoxDecoration(
                     color: Colores.primario,
-                    borderRadius: BorderRadius.circular(16),
+                    shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.refresh, 
-                    color: Colors.white,
+                    Icons.sync, 
+                    color: Colores.superficie,
                     size: 28,
                   ),
                 ),
