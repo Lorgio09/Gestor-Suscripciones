@@ -68,8 +68,14 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
     final meses = mesesDesde(pago.fechaInicio);
     final total = pago.costo * meses;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorBlanco,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colorBorde),
+      ),
       child: Row(
         children: [
           Container(
