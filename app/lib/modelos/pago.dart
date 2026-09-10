@@ -5,6 +5,11 @@ class Pago {
   String fecha;
   String url;
   String estado;
+  int? idTarjeta;
+  int? idCategoria;
+  String motivoCancelacion;
+  String fechaInicio;
+  String? fechaUltimoAviso;
 
   Pago({
     this.id,
@@ -13,6 +18,11 @@ class Pago {
     required this.fecha,
     required this.url,
     this.estado = "activa",
+    this.idTarjeta,
+    this.idCategoria,
+    this.motivoCancelacion = "",
+    this.fechaInicio = "",
+    this.fechaUltimoAviso,
   });
 
   Map<String, dynamic> aMapa() {
@@ -23,6 +33,11 @@ class Pago {
       'fecha': fecha,
       'url': url,
       'estado': estado,
+      'idTarjeta': idTarjeta,
+      'idCategoria': idCategoria,
+      'motivoCancelacion': motivoCancelacion,
+      'fechaInicio': fechaInicio.isEmpty ? fecha : fechaInicio,
+      'fechaUltimoAviso': fechaUltimoAviso,
     };
   }
 
@@ -34,6 +49,11 @@ class Pago {
       fecha: mapa['fecha'],
       url: mapa['url'],
       estado: mapa['estado'] ?? "activa",
+      idTarjeta: mapa['idTarjeta'],
+      idCategoria: mapa['idCategoria'],
+      motivoCancelacion: mapa['motivoCancelacion'] ?? "",
+      fechaInicio: mapa['fechaInicio'] ?? mapa['fecha'],
+      fechaUltimoAviso: mapa['fechaUltimoAviso'],
     );
   }
 }

@@ -4,67 +4,62 @@ import '../colores.dart';
 import '../modelos/usuario.dart';
 import '../sesion.dart';
 import '../tipografia.dart';
-import 'pantalla_cuenta_creada.dart';
+import 'encabezado.dart';
 
-class PantallaCrearCuenta extends StatefulWidget {
-  const PantallaCrearCuenta({super.key});
+class PantallaEditarPerfil extends StatefulWidget {
+  const PantallaEditarPerfil({super.key});
 
   @override
-  State<PantallaCrearCuenta> createState() => _EstadoCrearCuenta();
+  State<PantallaEditarPerfil> createState() => _EstadoEditarPerfil();
 }
 
-class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
+class _EstadoEditarPerfil extends State<PantallaEditarPerfil> {
   final controlNombre = TextEditingController();
   final controlCorreo = TextEditingController();
   final controlContrasena = TextEditingController();
 
+  Usuario? usuario;
   bool ocultarContrasena = true;
+  String? errorNombre;
   String? errorCorreo;
+  String? errorContrasena;
 
   @override
   void initState() {
     super.initState();
-    controlNombre.addListener(refrescar);
-    controlCorreo.addListener(refrescar);
-    controlContrasena.addListener(refrescar);
+    cargarUsuario();
   }
 
-  void refrescar() {
-    setState(() {});
-  }
-
-  bool get datosValidos {
-    return controlNombre.text.isNotEmpty &&
-        controlCorreo.text.contains('@') &&
-        controlContrasena.text.length >= 6;
-  }
-
-  Future<void> crearCuenta() async {
-    final repetido = await buscarUsuarioPorCorreo(controlCorreo.text);
+  Future<void> cargarUsuario() async {
+    final encontrado = await usuarioActual();
     if (!mounted) return;
+    if (encontrado == null) return;
+    setState(() {
+      usuario = encontrado;
+      controlNombre.text = encontrado.nombre;
+      controlCorreo.text = encontrado.correo;
+      controlContrasena.text = encontrado.contrasena;
+    });
+  }
 
-    if (repetido != null) {
-      setState(() {
-        errorCorreo = 'Ese correo ya tiene una cuenta';
-      });
-      return;
-    }
+  Future<void> guardarCambios() async {
+    setState(() {
+      errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
+      errorCorreo = controlCorreo.text.contains('@') ? null : 'Escribí un correo válido';
+      errorContrasena =
+          controlContrasena.text.length >= 6 ? null : 'Mínimo 6 caracteres';
+    });
+    if (errorNombre != null || errorCorreo != null || errorContrasena != null) return;
+    if (usuario == null) return;
 
-    final nuevoUsuario = Usuario(
-      nombre: controlNombre.text,
-      correo: controlCorreo.text,
-      contrasena: controlContrasena.text,
-    );
-    await crearUsuario(nuevoUsuario);
+    usuario!.nombre = controlNombre.text;
+    usuario!.correo = controlCorreo.text;
+    usuario!.contrasena = controlContrasena.text;
+
+    await actualizarUsuario(usuario!);
     await guardarSesion(controlNombre.text, controlCorreo.text);
     if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (ctx) => PantallaCuentaCreada(nombre: controlNombre.text),
-      ),
-    );
+    Navigator.pop(context);
   }
 
   Widget etiquetaObligatoria(String texto) {
@@ -86,8 +81,6 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
 
   @override
   Widget build(BuildContext context) {
-    final faltan = 6 - controlContrasena.text.length;
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -96,24 +89,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
-              Center(
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    gradient: degradadoMarca,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.refresh, color: colorBlanco, size: 28),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Crear cuenta',
-                style: Tipografia.titulo1,
-                textAlign: TextAlign.center,
-              ),
+              const Encabezado(titulo: 'Editar perfil'),
               const SizedBox(height: 24),
 
               etiquetaObligatoria('Nombre'),
@@ -121,9 +97,9 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
               TextField(
                 controller: controlNombre,
                 style: Tipografia.textoCampo,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.person_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'Princesa',
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.person_outline, color: colorTextoSecundario, size: 20),
+                  errorText: errorNombre,
                 ),
               ),
               const SizedBox(height: 16),
@@ -136,7 +112,6 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                 style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.mail_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'princesa@uagrm.edu.bo',
                   errorText: errorCorreo,
                 ),
               ),
@@ -150,7 +125,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                 style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'Mínimo 6 caracteres',
+                  errorText: errorContrasena,
                   suffixIcon: IconButton(
                     icon: Icon(
                       ocultarContrasena ? Icons.visibility_off : Icons.visibility,
@@ -165,27 +140,11 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                faltan > 0
-                    ? 'Mínimo 6 caracteres · te faltan $faltan'
-                    : 'Contraseña lista',
-                style: Tipografia.textoAyuda,
-              ),
               const SizedBox(height: 24),
 
               ElevatedButton(
-                onPressed: datosValidos ? crearCuenta : null,
-                child: const Text('Crear cuenta'),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: colorCoral,
-                  textStyle: Tipografia.etiqueta,
-                ),
-                child: const Text('Ya tengo cuenta'),
+                onPressed: guardarCambios,
+                child: const Text('Guardar'),
               ),
               const SizedBox(height: 24),
             ],

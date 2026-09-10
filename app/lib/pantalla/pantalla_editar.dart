@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
+import '../almacen/almacen_tarjetas.dart';
+import '../modelos/tarjeta.dart';
+import '../widgets/borde_punteado.dart';
 import '../colores.dart';
 import '../modelos/pago.dart';
 import '../tipografia.dart';
 import 'encabezado.dart';
+import 'pantalla_agregar_tarjeta.dart';
 
 class PantallaEditar extends StatefulWidget {
   final Pago pago;
@@ -24,6 +28,10 @@ class _EstadoEditar extends State<PantallaEditar> {
   String? errorCosto;
   String? errorFecha;
   String? errorUrl;
+  String? errorTarjeta;
+
+  List<Tarjeta> listaTarjetas = [];
+  int? idTarjetaElegida;
 
   @override
   void initState() {
@@ -32,12 +40,79 @@ class _EstadoEditar extends State<PantallaEditar> {
     controlCosto = TextEditingController(text: widget.pago.costo.toStringAsFixed(2));
     controlFecha = TextEditingController(text: widget.pago.fecha);
     controlUrl = TextEditingController(text: widget.pago.url);
+    idTarjetaElegida = widget.pago.idTarjeta;
+    cargarTarjetas();
+  }
+
+  Future<void> cargarTarjetas() async {
+    final datos = await leerTarjetas();
+    if (!mounted) return;
+    setState(() {
+      listaTarjetas = datos;
+    });
+  }
+
+  Future<void> irAAgregarTarjeta() async {
+    final tarjetaNueva = await Navigator.push<Tarjeta>(
+      context,
+      MaterialPageRoute(builder: (ctx) => const PantallaAgregarTarjeta()),
+    );
+    if (!mounted) return;
+    if (tarjetaNueva == null) return;
+    setState(() {
+      listaTarjetas.add(tarjetaNueva);
+      idTarjetaElegida = tarjetaNueva.id;
+      errorTarjeta = null;
+    });
+  }
+
+  Widget chipTarjeta(Tarjeta tarjeta) {
+    final elegida = idTarjetaElegida == tarjeta.id;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            idTarjetaElegida = tarjeta.id;
+            errorTarjeta = null;
+          });
+        },
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 36,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: elegida ? colorCoral : colorBlanco,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: elegida ? colorCoral : colorBorde),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.credit_card,
+                size: 16,
+                color: elegida ? colorBlanco : colorTextoSecundario,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '•••• ${tarjeta.ultimosDigitos}',
+                style: Tipografia.etiqueta.copyWith(
+                  color: elegida ? colorBlanco : colorTexto,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   bool validarFormulario() {
     setState(() {
       errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
       errorFecha = controlFecha.text.isEmpty ? 'Este campo es obligatorio' : null;
+      errorTarjeta = idTarjetaElegida == null ? 'Elegí una tarjeta' : null;
 
       if (controlCosto.text.isEmpty) {
         errorCosto = 'Este campo es obligatorio';
@@ -60,7 +135,8 @@ class _EstadoEditar extends State<PantallaEditar> {
     return errorNombre == null &&
         errorCosto == null &&
         errorFecha == null &&
-        errorUrl == null;
+        errorUrl == null &&
+        errorTarjeta == null;
   }
 
   Future<void> guardarCambios() async {
@@ -73,6 +149,9 @@ class _EstadoEditar extends State<PantallaEditar> {
       fecha: controlFecha.text,
       url: controlUrl.text,
       estado: widget.pago.estado,
+      idTarjeta: idTarjetaElegida,
+      idCategoria: widget.pago.idCategoria,
+      motivoCancelacion: widget.pago.motivoCancelacion,
     );
 
     await actualizarPago(widget.pago.id!, pagoEditado);
@@ -89,9 +168,9 @@ class _EstadoEditar extends State<PantallaEditar> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colores.primario, 
+              primary: colorCoral, 
               onPrimary: Colors.white,
-              onSurface: Colores.textoPrincipal,
+              onSurface: colorTexto,
             ),
           ),
           child: child!,
@@ -110,7 +189,7 @@ class _EstadoEditar extends State<PantallaEditar> {
     return Row(
       children: [
         Text(texto, style: Tipografia.etiqueta),
-        Text(' *', style: Tipografia.etiqueta.copyWith(color: Colores.error)),
+        Text(' *', style: Tipografia.etiqueta.copyWith(color: colorError)),
       ],
     );
   }
@@ -146,7 +225,7 @@ class _EstadoEditar extends State<PantallaEditar> {
                   hintText: 'Ej. Netflix',
                   errorText: errorNombre,
                   prefixIcon: const Icon(Icons.local_offer_outlined,
-                      size: 16, color: Colores.textoSecundario),
+                      size: 16, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -176,7 +255,7 @@ class _EstadoEditar extends State<PantallaEditar> {
                   hintText: 'DD / MM / AAAA',
                   errorText: errorFecha,
                   prefixIcon: const Icon(Icons.calendar_today_outlined,
-                      size: 16, color: Colores.textoSecundario),
+                      size: 16, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -191,9 +270,43 @@ class _EstadoEditar extends State<PantallaEditar> {
                   hintText: 'https://...',
                   errorText: errorUrl,
                   prefixIcon: const Icon(Icons.link,
-                      size: 16, color: Colores.textoSecundario),
+                      size: 16, color: colorTextoSecundario),
                 ),
               ),
+              const SizedBox(height: 16),
+
+              etiquetaObligatoria('¿Con qué tarjeta pagás?'),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final tarjeta in listaTarjetas) chipTarjeta(tarjeta),
+                    InkWell(
+                      onTap: irAAgregarTarjeta,
+                      borderRadius: BorderRadius.circular(18),
+                      child: BordePunteado(
+                        child: Container(
+                          height: 36,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '+ Agregar',
+                            style: Tipografia.etiqueta.copyWith(color: colorCoral),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (errorTarjeta != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  errorTarjeta!,
+                  style: Tipografia.textoAyuda.copyWith(color: colorError),
+                ),
+              ],
               const SizedBox(height: 24),
 
               SizedBox(

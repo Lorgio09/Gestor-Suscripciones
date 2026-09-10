@@ -1,44 +1,81 @@
 import 'package:flutter/material.dart';
+import '../almacen/almacen_usuarios.dart';
 import '../colores.dart';
+import '../correo.dart';
 import '../tipografia.dart';
+import 'pantalla_codigo.dart';
 
 class PantallaRecuperarContrasena extends StatefulWidget {
-  final String correoDestino;
-
-  const PantallaRecuperarContrasena({
-    super.key,
-    this.correoDestino = 'princesa@uagrm.edu.bo', 
-  });
+  const PantallaRecuperarContrasena({super.key});
 
   @override
   State<PantallaRecuperarContrasena> createState() => _EstadoRecuperarContrasena();
 }
 
 class _EstadoRecuperarContrasena extends State<PantallaRecuperarContrasena> {
-  bool _ocultarNuevaPassword = true;
-  bool _ocultarRepetirPassword = true;
+  final controlCorreo = TextEditingController();
 
-  Widget _construirEtiqueta(String texto) {
-    return Row(
-      children: [
-        Text(texto, style: Tipografia.etiqueta),
-        Text(' *', style: Tipografia.etiqueta.copyWith(color: Colores.error)),
-      ],
+  bool enviando = false;
+  String? errorCorreo;
+
+  Future<void> enviarElCodigo() async {
+    setState(() {
+      errorCorreo = null;
+    });
+
+    if (!controlCorreo.text.contains('@')) {
+      setState(() {
+        errorCorreo = 'Escribí un correo válido';
+      });
+      return;
+    }
+
+    final usuario = await buscarUsuarioPorCorreo(controlCorreo.text);
+    if (!mounted) return;
+
+    if (usuario == null) {
+      setState(() {
+        errorCorreo = 'No hay ninguna cuenta con ese correo';
+      });
+      return;
+    }
+
+    setState(() {
+      enviando = true;
+    });
+
+    final codigo = generarCodigo();
+    try {
+      await enviarCodigo(controlCorreo.text, codigo);
+    } catch (falla) {
+      if (!mounted) return;
+      setState(() {
+        enviando = false;
+        errorCorreo = 'No pudimos mandar el correo, revisá tu conexión';
+      });
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      enviando = false;
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => PantallaCodigo(
+          correo: controlCorreo.text,
+          codigoEnviado: codigo,
+        ),
+      ),
     );
   }
 
-  Widget _construirCirculo(bool lleno) {
-    return Container(
-      width: 14,
-      height: 14,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: lleno ? Colores.primario : Colors.transparent,
-        border: lleno 
-            ? null 
-            : Border.all(color: Colores.primario, width: 2), 
-      ),
-    );
+  @override
+  void dispose() {
+    controlCorreo.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,148 +83,65 @@ class _EstadoRecuperarContrasena extends State<PantallaRecuperarContrasena> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   InkWell(
                     onTap: () => Navigator.pop(context),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(10),
                     child: Container(
-                      width: 32,
-                      height: 32,
+                      width: 34,
+                      height: 34,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colores.superficie, 
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colores.borde),
+                        color: colorBlanco,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: colorBorde),
                       ),
-                      child: const Icon(
-                        Icons.chevron_left,
-                        size: 20,
-                        color: Colores.textoPrincipal,
-                      ),
+                      child: const Icon(Icons.chevron_left, size: 20, color: colorTexto),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Recuperar contraseña',
-                    style: Tipografia.titulo1,
+                  const Expanded(
+                    child: Text('Recuperar contraseña', style: Tipografia.titulo1),
                   ),
                 ],
               ),
-              
               const SizedBox(height: 24),
-              RichText(
-                text: TextSpan(
-                  text: 'Te mandamos un código de 4 dígitos a\n',
-                  style: Tipografia.textoCampo.copyWith(
-                    color: Colores.textoSecundario,
-                    height: 1.5,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: widget.correoDestino,
-                      style: Tipografia.textoCampo.copyWith(
-                        fontWeight: FontWeight.bold, 
-                        color: Colores.textoPrincipal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _construirCirculo(true),
-                  const SizedBox(width: 12), 
-                  _construirCirculo(true),
-                  const SizedBox(width: 12),
-                  _construirCirculo(true),
-                  const SizedBox(width: 12),
-                  _construirCirculo(false),
-                ],
-              ),
-              
-              const SizedBox(height: 24),
-              
-              _construirEtiqueta('Nueva contraseña'),
-              const SizedBox(height: 8),
-              TextFormField(
-                obscureText: _ocultarNuevaPassword,
-                style: Tipografia.textoCampo,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_outline, color: Colores.textoSecundario, size: 20),
-                  hintText: 'Mínimo 6 caracteres',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _ocultarNuevaPassword ? Icons.visibility_off : Icons.visibility,
-                      color: Colores.textoSecundario,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _ocultarNuevaPassword = !_ocultarNuevaPassword;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Campo: Repetir contraseña
-              _construirEtiqueta('Repetir contraseña'),
-              const SizedBox(height: 8),
-              TextFormField(
-                obscureText: _ocultarRepetirPassword,
-                style: Tipografia.textoCampo,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_outline, color: Colores.textoSecundario, size: 20),
-                  hintText: 'Tiene que ser igual',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _ocultarRepetirPassword ? Icons.visibility_off : Icons.visibility,
-                      color: Colores.textoSecundario,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _ocultarRepetirPassword = !_ocultarRepetirPassword;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 51,
-                child: ElevatedButton(
-                  onPressed: () {
-                  },
-                  child: const Text('Guardar contraseña'),
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              TextButton(
-                onPressed: () {
 
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colores.primario,
-                  textStyle: Tipografia.etiqueta,
-                ),
-                child: const Text('Reenviar código'),
+              Text(
+                'Escribí el correo de tu cuenta y te mandamos un código de 4 dígitos.',
+                style: Tipografia.textoCampo.copyWith(color: colorTextoSecundario),
               ),
-              
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  Text('Correo', style: Tipografia.etiqueta),
+                  Text(' *', style: Tipografia.etiqueta.copyWith(color: colorError)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controlCorreo,
+                keyboardType: TextInputType.emailAddress,
+                style: Tipografia.textoCampo,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.mail_outline, color: colorTextoSecundario, size: 20),
+                  hintText: 'princesa@uagrm.edu.bo',
+                  errorText: errorCorreo,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              ElevatedButton(
+                onPressed: enviando ? null : enviarElCodigo,
+                child: Text(enviando ? 'Enviando…' : 'Enviar código'),
+              ),
               const SizedBox(height: 24),
             ],
           ),

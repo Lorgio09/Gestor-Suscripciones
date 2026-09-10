@@ -13,11 +13,11 @@ String inicialDe(String nombre) {
 
 Color colorPorNombre(String nombre) {
   final List<Color> paletaAvatares = [
-    Colores.primario,    
-    Colores.secundario, 
-    Colores.error,  
-    Colores.textoSecundario, 
-    Colores.textoPrincipal, 
+    colorCoral,
+    colorCoralOscuro,
+    colorRojo,
+    colorExito,
+    colorTextoSecundario,
   ];
 
   int suma = 0;
@@ -69,4 +69,39 @@ bool estaPorVencer(String fecha) {
   );
   final dias = proximo.difference(DateTime.now()).inDays;
   return dias >= 0 && dias <= 7;
+}
+
+int diasHastaCobro(String fecha) {
+  final partes = fecha.split('/');
+  if (partes.length != 3) return 0;
+
+  final cobro = DateTime(
+    int.parse(partes[2]),
+    int.parse(partes[1]),
+    int.parse(partes[0]),
+  );
+  final hoy = DateTime.now();
+  final dias = cobro.difference(DateTime(hoy.year, hoy.month, hoy.day)).inDays;
+  if (dias < 0) return 0;
+  return dias;
+}
+
+int mesesDesde(String fecha) {
+  final partes = fecha.split('/');
+  if (partes.length != 3) return 1;
+
+  final inicio = DateTime(int.parse(partes[2]), int.parse(partes[1]));
+  final hoy = DateTime.now();
+  final meses = (hoy.year - inicio.year) * 12 + (hoy.month - inicio.month);
+  if (meses < 1) return 1;
+  return meses;
+}
+
+String mesYAnio(String fecha) {
+  final partes = fecha.split('/');
+  if (partes.length != 3) return fecha;
+
+  final mes = int.parse(partes[1]);
+  if (mes < 1 || mes > 12) return fecha;
+  return '${nombresMes[mes - 1]} ${partes[2]}';
 }

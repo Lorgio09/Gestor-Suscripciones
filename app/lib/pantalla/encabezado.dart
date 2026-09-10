@@ -19,14 +19,14 @@ class Encabezado extends StatelessWidget {
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colores.superficie, 
+              color: colorBlanco, 
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colores.borde), 
+              border: Border.all(color: colorBorde), 
             ),
             child: const Icon(
               Icons.arrow_back_ios_new, 
               size: 14, 
-              color: Colores.textoPrincipal 
+              color: colorTexto 
             ),
           ),
         ),

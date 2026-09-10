@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
+import '../almacen/almacen_tarjetas.dart';
 import '../colores.dart';
 import '../modelos/pago.dart';
+import '../modelos/tarjeta.dart';
 import '../tipografia.dart';
 import 'encabezado.dart';
+import 'pantalla_agregar_tarjeta.dart';
+import '../widgets/borde_punteado.dart';
 
 class PantallaRegistro extends StatefulWidget {
   const PantallaRegistro({super.key});
@@ -18,34 +22,65 @@ class _EstadoRegistro extends State<PantallaRegistro> {
   final controlFecha = TextEditingController();
   final controlUrl = TextEditingController();
 
+  List<Tarjeta> listaTarjetas = [];
+  int? idTarjetaElegida;
+
   String? errorNombre;
   String? errorCosto;
   String? errorFecha;
   String? errorUrl;
+  String? errorTarjeta;
+
   @override
   void initState() {
     super.initState();
-    controlNombre.addListener(_actualizarPantalla);
-    controlCosto.addListener(_actualizarPantalla);
-    controlFecha.addListener(_actualizarPantalla);
-    controlUrl.addListener(_actualizarPantalla);
+    controlNombre.addListener(refrescar);
+    controlCosto.addListener(refrescar);
+    controlFecha.addListener(refrescar);
+    controlUrl.addListener(refrescar);
+    cargarTarjetas();
   }
 
-  void _actualizarPantalla() {
-    setState(() {}); 
+  void refrescar() {
+    setState(() {});
   }
 
-  bool get _camposCompletos {
+  Future<void> cargarTarjetas() async {
+    final datos = await leerTarjetas();
+    if (!mounted) return;
+    setState(() {
+      listaTarjetas = datos;
+    });
+  }
+
+  bool get camposCompletos {
     return controlNombre.text.isNotEmpty &&
-           controlCosto.text.isNotEmpty &&
-           controlFecha.text.isNotEmpty &&
-           controlUrl.text.isNotEmpty;
+        controlCosto.text.isNotEmpty &&
+        controlFecha.text.isNotEmpty &&
+        controlUrl.text.isNotEmpty &&
+        idTarjetaElegida != null;
+  }
+
+  Future<void> irAAgregarTarjeta() async {
+    final tarjetaNueva = await Navigator.push<Tarjeta>(
+      context,
+      MaterialPageRoute(builder: (ctx) => const PantallaAgregarTarjeta()),
+    );
+    if (!mounted) return;
+    if (tarjetaNueva == null) return;
+
+    setState(() {
+      listaTarjetas.add(tarjetaNueva);
+      idTarjetaElegida = tarjetaNueva.id;
+      errorTarjeta = null;
+    });
   }
 
   bool validarFormulario() {
     setState(() {
       errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
       errorFecha = controlFecha.text.isEmpty ? 'Este campo es obligatorio' : null;
+      errorTarjeta = idTarjetaElegida == null ? 'Elegí una tarjeta' : null;
 
       if (controlCosto.text.isEmpty) {
         errorCosto = 'Este campo es obligatorio';
@@ -68,7 +103,8 @@ class _EstadoRegistro extends State<PantallaRegistro> {
     return errorNombre == null &&
         errorCosto == null &&
         errorFecha == null &&
-        errorUrl == null;
+        errorUrl == null &&
+        errorTarjeta == null;
   }
 
   Future<void> guardarNuevoPago() async {
@@ -79,6 +115,8 @@ class _EstadoRegistro extends State<PantallaRegistro> {
       costo: double.parse(controlCosto.text),
       fecha: controlFecha.text,
       url: controlUrl.text,
+      idTarjeta: idTarjetaElegida,
+      fechaInicio: controlFecha.text,
     );
 
     await agregarPago(nuevoPago);
@@ -95,9 +133,9 @@ class _EstadoRegistro extends State<PantallaRegistro> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colores.primario, 
-              onPrimary: Colors.white, 
-              onSurface: Colores.textoPrincipal, 
+              primary: colorCoral,
+              onPrimary: colorBlanco,
+              onSurface: colorTexto,
             ),
           ),
           child: child!,
@@ -116,18 +154,73 @@ class _EstadoRegistro extends State<PantallaRegistro> {
     return Row(
       children: [
         Text(texto, style: Tipografia.etiqueta),
-        Text(' *', style: Tipografia.etiqueta.copyWith(color: Colores.error)),
+        Text(' *', style: Tipografia.etiqueta.copyWith(color: colorError)),
       ],
+    );
+  }
+
+  Widget chipTarjeta(Tarjeta tarjeta) {
+    final elegida = idTarjetaElegida == tarjeta.id;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            idTarjetaElegida = tarjeta.id;
+            errorTarjeta = null;
+          });
+        },
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 36,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: elegida ? colorCoral : colorBlanco,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: elegida ? colorCoral : colorBorde),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.credit_card,
+                size: 16,
+                color: elegida ? colorBlanco : colorTextoSecundario,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '•••• ${tarjeta.ultimosDigitos}',
+                style: Tipografia.etiqueta.copyWith(
+                  color: elegida ? colorBlanco : colorTexto,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget chipAgregar() {
+    return InkWell(
+      onTap: irAAgregarTarjeta,
+      borderRadius: BorderRadius.circular(18),
+      child: BordePunteado(
+        child: Container(
+          height: 36,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          alignment: Alignment.center,
+          child: Text(
+            '+ Agregar',
+            style: Tipografia.etiqueta.copyWith(color: colorCoral),
+          ),
+        ),
+      ),
     );
   }
 
   @override
   void dispose() {
-    controlNombre.removeListener(_actualizarPantalla);
-    controlCosto.removeListener(_actualizarPantalla);
-    controlFecha.removeListener(_actualizarPantalla);
-    controlUrl.removeListener(_actualizarPantalla);
-    
     controlNombre.dispose();
     controlCosto.dispose();
     controlFecha.dispose();
@@ -156,7 +249,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
                 decoration: InputDecoration(
                   hintText: 'Ej. Netflix',
                   errorText: errorNombre,
-                  prefixIcon: const Icon(Icons.local_offer_outlined, size: 16, color: Colores.textoSecundario),
+                  prefixIcon: const Icon(Icons.sell_outlined, size: 20, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -165,8 +258,8 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               const SizedBox(height: 8),
               TextField(
                 controller: controlCosto,
-                style: Tipografia.textoCampo,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   hintText: '0.00',
                   prefixText: 'Bs  ',
@@ -179,13 +272,13 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               const SizedBox(height: 8),
               TextField(
                 controller: controlFecha,
-                style: Tipografia.textoCampo,
                 readOnly: true,
                 onTap: seleccionarFecha,
+                style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   hintText: 'DD / MM / AAAA',
                   errorText: errorFecha,
-                  prefixIcon: const Icon(Icons.calendar_today_outlined, size: 16, color: Colores.textoSecundario),
+                  prefixIcon: const Icon(Icons.calendar_today, size: 20, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -194,22 +287,41 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               const SizedBox(height: 8),
               TextField(
                 controller: controlUrl,
-                style: Tipografia.textoCampo,
                 keyboardType: TextInputType.url,
+                style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   hintText: 'https://...',
                   errorText: errorUrl,
-                  prefixIcon: const Icon(Icons.link, size: 16, color: Colores.textoSecundario),
+                  prefixIcon: const Icon(Icons.link, size: 20, color: colorTextoSecundario),
                 ),
               ),
+              const SizedBox(height: 16),
+
+              etiquetaObligatoria('¿Con qué tarjeta pagaste?'),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final tarjeta in listaTarjetas) chipTarjeta(tarjeta),
+                    chipAgregar(),
+                  ],
+                ),
+              ),
+              if (errorTarjeta != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  errorTarjeta!,
+                  style: Tipografia.textoAyuda.copyWith(color: colorError),
+                ),
+              ],
               const SizedBox(height: 24),
 
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _camposCompletos ? guardarNuevoPago : null,
-                  icon: const Icon(Icons.check, size: 16),
-                  label: const Text('Guardar pago'),
+                child: ElevatedButton(
+                  onPressed: camposCompletos ? guardarNuevoPago : null,
+                  child: const Text('Guardar pago'),
                 ),
               ),
               const SizedBox(height: 24),

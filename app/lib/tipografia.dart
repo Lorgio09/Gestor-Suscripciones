@@ -7,7 +7,7 @@ class Tipografia {
     fontFamily: 'Sora',
     fontSize: 24,
     fontWeight: FontWeight.w700,
-    color: Colores.textoPrincipal,
+    color: colorTexto,
   );
 
   // Etiqueta de los campos
@@ -15,7 +15,7 @@ class Tipografia {
     fontFamily: 'PlusJakartaSans',
     fontSize: 13,
     fontWeight: FontWeight.w600,
-    color: Colores.textoPrincipal,
+    color: colorTexto,
   );
 
   // Texto que el usuario escribe en el campo 
@@ -23,7 +23,7 @@ class Tipografia {
     fontFamily: 'PlusJakartaSans',
     fontSize: 15,
     fontWeight: FontWeight.w400,
-    color: Colores.textoPrincipal,
+    color: colorTexto,
   );
 
   // Texto de ayuda abajo del input 
@@ -31,7 +31,7 @@ class Tipografia {
     fontFamily: 'PlusJakartaSans',
     fontSize: 11,
     fontWeight: FontWeight.w400,
-    color: Colores.textoSecundario,
+    color: colorTextoSecundario,
   );
 
   // Texto del botón 
@@ -46,6 +46,6 @@ class Tipografia {
     fontFamily: 'Sora',
     fontSize: 16,
     fontWeight: FontWeight.w700,
-    color: Colores.textoPrincipal,
+    color: colorTexto,
   );
 }

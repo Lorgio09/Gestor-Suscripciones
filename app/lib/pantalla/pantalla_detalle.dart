@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../almacen/almacen.dart';
+import '../almacen/almacen_tarjetas.dart';
 import '../colores.dart';
 import '../formato.dart';
 import '../modelos/pago.dart';
+import '../modelos/tarjeta.dart';
 import '../tipografia.dart';
 import 'encabezado.dart';
 import 'pantalla_editar.dart';
-
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../colores.dart';
-import '../tipografia.dart';
-import 'encabezado.dart';
-// import '../modelos/pago.dart'; 
 
 class PantallaDetalle extends StatefulWidget {
   final Pago pago;
@@ -24,38 +19,97 @@ class PantallaDetalle extends StatefulWidget {
   State<PantallaDetalle> createState() => _EstadoDetalle();
 }
 
-class _EstadoDetalle extends State<PantallaDetalle> {
+class _EstadoDetalle extends State<PantallaDetalle> with WidgetsBindingObserver {
   late Pago pago;
+  Tarjeta? tarjeta;
+  bool esperandoRespuesta = false;
 
   @override
   void initState() {
     super.initState();
     pago = widget.pago;
+    WidgetsBinding.instance.addObserver(this);
+    cargarTarjeta();
   }
 
-  void abrirUrl() async {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState estadoApp) {
+    if (estadoApp == AppLifecycleState.resumed && esperandoRespuesta) {
+      esperandoRespuesta = false;
+      preguntarSiPago();
+    }
+  }
+
+  Future<void> guardarEstado(String nuevoEstado) async {
+    pago.estado = nuevoEstado;
+    await actualizarPago(pago.id!, pago);
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void preguntarSiPago() {
+    showDialog(
+      context: context,
+      builder: (contexto) => AlertDialog(
+        backgroundColor: colorBlanco,
+        title: Text('¿Pagaste ${pago.nombre}?', style: Tipografia.titulo1.copyWith(fontSize: 18)),
+        content: Text(
+          'Si todavía no lo pagaste la dejamos como pendiente.',
+          style: Tipografia.textoCampo,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(contexto);
+              await guardarEstado('pendiente');
+            },
+            child: Text('Todavía no', style: Tipografia.textoAyuda),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(contexto);
+              await guardarEstado('activa');
+            },
+            child: Text(
+              'Sí, ya pagué',
+              style: Tipografia.etiqueta.copyWith(color: colorCoral),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> cargarTarjeta() async {
+    if (pago.idTarjeta == null) return;
+    final encontrada = await buscarTarjeta(pago.idTarjeta!);
+    if (!mounted) return;
+    setState(() {
+      tarjeta = encontrada;
+    });
+  }
+
+  Future<void> abrirUrl() async {
+    esperandoRespuesta = true;
     final uri = Uri.parse(pago.url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
-  String textoEstado() {
-    if (pago.estado == 'para_cancelar') return 'Marcada para cancelar';
-    if (pago.estado == 'cancelada') return 'Suscripción cancelada';
-    return 'Suscripción activa';
   }
 
   Future<void> irAEditar() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (ctx) => PantallaEditar(pago: pago),
-      ),
+      MaterialPageRoute(builder: (ctx) => PantallaEditar(pago: pago)),
     );
 
     final pagoActualizado = await buscarPago(pago.id!);
     if (!mounted) return;
     if (pagoActualizado == null) return;
-
     setState(() {
       pago = pagoActualizado;
     });
@@ -65,8 +119,8 @@ class _EstadoDetalle extends State<PantallaDetalle> {
     showDialog(
       context: context,
       builder: (contexto) => AlertDialog(
-        backgroundColor: Colores.superficie, 
-        title: const Text('Eliminar suscripción', style: Tipografia.titulo1),
+        backgroundColor: colorBlanco,
+        title: Text('Eliminar suscripción', style: Tipografia.titulo1),
         content: Text(
           '¿Eliminar "${pago.nombre}"? Esta acción no se puede deshacer.',
           style: Tipografia.textoCampo,
@@ -74,7 +128,7 @@ class _EstadoDetalle extends State<PantallaDetalle> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(contexto),
-            child: const Text('Cancelar', style: Tipografia.textoAyuda),
+            child: Text('Cancelar', style: Tipografia.textoAyuda),
           ),
           TextButton(
             onPressed: () async {
@@ -84,7 +138,7 @@ class _EstadoDetalle extends State<PantallaDetalle> {
             },
             child: Text(
               'Eliminar',
-              style: Tipografia.etiqueta.copyWith(color: Colores.error),
+              style: Tipografia.etiqueta.copyWith(color: colorError),
             ),
           ),
         ],
@@ -92,17 +146,50 @@ class _EstadoDetalle extends State<PantallaDetalle> {
     );
   }
 
-  Widget tarjetaDato(IconData icono, String etiqueta, String valor) {
+  Widget badgeEstado() {
+    Color fondo = colorExitoSuave;
+    Color letra = colorExito;
+    IconData icono = Icons.check;
+    String texto = 'Suscripción activa';
+
+    if (pago.estado == 'pendiente') {
+      fondo = colorAvisoSuave;
+      letra = colorAviso;
+      icono = Icons.schedule;
+      texto = 'Pago pendiente';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: fondo,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icono, size: 16, color: letra),
+          const SizedBox(width: 8),
+          Text(texto, style: Tipografia.etiqueta.copyWith(color: letra)),
+        ],
+      ),
+    );
+  }
+
+  Widget tarjetaDato(IconData icono, String etiqueta, String valor, {Color? colorValor}) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16), 
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icono, size: 16, color: Colores.textoSecundario),
-            const SizedBox(width: 8), 
+            Icon(icono, size: 16, color: colorTextoSecundario),
+            const SizedBox(width: 12),
             Text(etiqueta, style: Tipografia.textoCampo),
             const Spacer(),
-            Text(valor, style: Tipografia.numerico), 
+            Text(
+              valor,
+              style: Tipografia.numerico.copyWith(fontSize: 15, color: colorValor),
+            ),
           ],
         ),
       ),
@@ -116,10 +203,10 @@ class _EstadoDetalle extends State<PantallaDetalle> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 24), 
-              const Encabezado(titulo: 'Detalle'), 
+              const SizedBox(height: 24),
+              const Encabezado(titulo: 'Detalle'),
               const SizedBox(height: 24),
 
               Center(
@@ -130,28 +217,25 @@ class _EstadoDetalle extends State<PantallaDetalle> {
                       height: 64,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colores.primario, 
+                        color: colorPorNombre(pago.nombre),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Text(
                         inicialDe(pago.nombre),
-                        style: Tipografia.titulo1.copyWith(
-                          color: Colors.white, 
-                          fontSize: 32, 
-                        ),
+                        style: Tipografia.titulo1.copyWith(color: colorBlanco, fontSize: 32),
                       ),
                     ),
                     const SizedBox(height: 16),
                     Text(pago.nombre, style: Tipografia.titulo1),
                     const SizedBox(height: 8),
-                    Text(textoEstado(), style: Tipografia.textoAyuda),
+                    badgeEstado(),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
 
               tarjetaDato(
-                Icons.schedule,
+                Icons.credit_card,
                 'Costo mensual',
                 'Bs ${pago.costo.toStringAsFixed(2)}',
               ),
@@ -159,20 +243,25 @@ class _EstadoDetalle extends State<PantallaDetalle> {
               tarjetaDato(
                 Icons.calendar_today,
                 'Próximo pago',
-                calcularProximoPago(pago.fecha), 
+                calcularProximoPago(pago.fecha),
+                colorValor: colorCoral,
+              ),
+              const SizedBox(height: 16),
+              tarjetaDato(
+                Icons.account_balance,
+                'Pagado con',
+                tarjeta == null
+                    ? 'Sin tarjeta'
+                    : '${tarjeta!.alias} •••• ${tarjeta!.ultimosDigitos}',
               ),
               const SizedBox(height: 24),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: abrirUrl,
-                  icon: const Icon(Icons.open_in_new, size: 16),
-                  label: const Text('Ir a pagar'),
-                ),
+              ElevatedButton.icon(
+                onPressed: abrirUrl,
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: const Text('Ir a pagar'),
               ),
               const SizedBox(height: 8),
-
               Row(
                 children: [
                   Expanded(
@@ -181,20 +270,20 @@ class _EstadoDetalle extends State<PantallaDetalle> {
                       icon: const Icon(Icons.edit_outlined, size: 16),
                       label: const Text('Editar'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colores.primario,
-                        side: const BorderSide(color: Colores.primario),
+                        foregroundColor: colorCoral,
+                        side: const BorderSide(color: colorCoral),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: confirmarEliminar,
                       icon: const Icon(Icons.delete_outline, size: 16),
                       label: const Text('Eliminar'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colores.error,
-                        side: const BorderSide(color: Colores.error),
+                        foregroundColor: colorError,
+                        side: const BorderSide(color: colorError),
                       ),
                     ),
                   ),

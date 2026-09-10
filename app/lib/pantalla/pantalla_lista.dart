@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import '../almacen/almacen.dart';
+import '../avisos.dart';
+import '../almacen/almacen_tarjetas.dart';
 import '../colores.dart';
 import '../formato.dart';
 import '../modelos/pago.dart';
+import '../modelos/tarjeta.dart';
+import '../sesion.dart';
 import '../tipografia.dart';
 import 'pantalla_registro.dart';
 import 'pantalla_detalle.dart';
@@ -16,18 +20,53 @@ class PantallaLista extends StatefulWidget {
 
 class _EstadoLista extends State<PantallaLista> {
   List<Pago> listaPagos = [];
+  List<Tarjeta> listaTarjetas = [];
+  String nombreUsuario = '';
 
   @override
   void initState() {
     super.initState();
-    cargarPagos();
+    cargarTodo();
   }
 
-  Future<void> cargarPagos() async {
-    final datos = await leerPagos(); 
+  Future<void> cargarTodo() async {
+    final pagos = await leerPagos();
+    final tarjetas = await leerTarjetas();
+    final nombre = await leerNombreUsuario();
+    if (!mounted) return;
     setState(() {
-      listaPagos = datos;
+      listaPagos = pagos;
+      listaTarjetas = tarjetas;
+      nombreUsuario = nombre;
     });
+
+    revisarAvisos();
+  }
+
+  double get gastoMensual {
+    double total = 0;
+    for (final pago in listaPagos) {
+      total = total + pago.costo;
+    }
+    return total;
+  }
+
+  int get diasParaElProximoCobro {
+    int menor = 999;
+    for (final pago in listaPagos) {
+      final dias = diasHastaCobro(calcularProximoPago(pago.fecha));
+      if (dias < menor) menor = dias;
+    }
+    if (menor == 999) return 0;
+    return menor;
+  }
+
+  Tarjeta? tarjetaDe(Pago pago) {
+    if (pago.idTarjeta == null) return null;
+    for (final tarjeta in listaTarjetas) {
+      if (tarjeta.id == pago.idTarjeta) return tarjeta;
+    }
+    return null;
   }
 
   void irARegistro() async {
@@ -35,67 +74,103 @@ class _EstadoLista extends State<PantallaLista> {
       context,
       MaterialPageRoute(builder: (ctx) => const PantallaRegistro()),
     );
-    cargarPagos();
+    cargarTodo();
   }
 
   void irADetalle(Pago pago) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (ctx) => PantallaDetalle(pago: pago),
-      ),
+      MaterialPageRoute(builder: (ctx) => PantallaDetalle(pago: pago)),
     );
-    cargarPagos();
+    cargarTodo();
   }
 
-  Widget armarTarjeta(Pago pago) {
+  Widget resumen() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        gradient: degradadoMarca,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Gasto mensual total',
+            style: Tipografia.textoAyuda.copyWith(fontSize: 12, color: colorBlanco),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Bs ${gastoMensual.toStringAsFixed(2)}',
+            style: Tipografia.numerico.copyWith(fontSize: 30, color: colorBlanco),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${listaPagos.length} activas · próximo cobro en $diasParaElProximoCobro días',
+            style: Tipografia.textoAyuda.copyWith(fontSize: 12, color: colorBlanco),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget fila(Pago pago) {
     final proximo = calcularProximoPago(pago.fecha);
-    final colorVencimiento = estaPorVencer(proximo) ? Colores.error : Colores.textoSecundario;
+    final tarjeta = tarjetaDe(pago);
+
+    String detalle = 'Vence el ${fechaCorta(proximo)}';
+    if (tarjeta != null) {
+      detalle = '$detalle · •••• ${tarjeta.ultimosDigitos}';
+    }
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: () => irADetalle(pago),
-        borderRadius: BorderRadius.circular(14), 
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colores.primario, 
-                  borderRadius: BorderRadius.circular(12),
+                  color: colorPorNombre(pago.nombre),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  inicialDe(pago.nombre), 
-                  style: Tipografia.titulo1.copyWith(color: Colores.superficie, fontSize: 20),
+                  inicialDe(pago.nombre),
+                  style: Tipografia.numerico.copyWith(color: colorBlanco),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      pago.nombre, 
+                      pago.nombre,
                       style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Vence el ${fechaCorta(proximo)}',
-                      style: Tipografia.textoAyuda.copyWith(color: colorVencimiento),
+                      detalle,
+                      style: Tipografia.textoAyuda.copyWith(fontSize: 12),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Bs ${pago.costo.toStringAsFixed(2)}', style: Tipografia.numerico),
+                  Text(
+                    'Bs ${pago.costo.toStringAsFixed(2)}',
+                    style: Tipografia.numerico.copyWith(fontSize: 15),
+                  ),
                   const SizedBox(height: 8),
                   Text('/mes', style: Tipografia.textoAyuda),
                 ],
@@ -114,14 +189,26 @@ class _EstadoLista extends State<PantallaLista> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
+              Text(
+                'Hola, $nombreUsuario',
+                style: Tipografia.etiqueta.copyWith(
+                  fontWeight: FontWeight.w400,
+                  color: colorTextoSecundario,
+                ),
+              ),
+              const SizedBox(height: 8),
               const Text('Mis suscripciones', style: Tipografia.titulo1),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              resumen(),
+              const SizedBox(height: 16),
+
               Expanded(
                 child: listaPagos.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No hay suscripciones registradas.',
                           style: Tipografia.textoAyuda,
@@ -130,7 +217,7 @@ class _EstadoLista extends State<PantallaLista> {
                     : ListView.builder(
                         padding: EdgeInsets.zero,
                         itemCount: listaPagos.length,
-                        itemBuilder: (contexto, i) => armarTarjeta(listaPagos[i]),
+                        itemBuilder: (contexto, i) => fila(listaPagos[i]),
                       ),
               ),
             ],
@@ -143,11 +230,11 @@ class _EstadoLista extends State<PantallaLista> {
           width: 56,
           height: 56,
           child: FloatingActionButton(
-            backgroundColor: Colores.primario,
+            backgroundColor: colorCoral,
             elevation: 0,
             shape: const CircleBorder(),
             onPressed: irARegistro,
-            child: const Icon(Icons.add, color: Colores.superficie),
+            child: const Icon(Icons.add, color: colorBlanco),
           ),
         ),
       ),

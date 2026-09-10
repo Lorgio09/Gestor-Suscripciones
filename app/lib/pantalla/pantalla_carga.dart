@@ -1,47 +1,66 @@
 import 'package:flutter/material.dart';
 import '../colores.dart';
+import '../sesion.dart';
 import '../tipografia.dart';
-import 'pantalla_lista.dart';
 import 'pantalla_iniciar_sesion.dart';
+import 'pantalla_principal.dart';
 
 class PantallaCarga extends StatefulWidget {
-  final bool tieneSesion;
-  final String nombreUsuario;
-
-  const PantallaCarga({
-    super.key, 
-    this.tieneSesion = false,
-    this.nombreUsuario = '', 
-  });
+  const PantallaCarga({super.key});
 
   @override
-  State<PantallaCarga> createState() => _EstadoPantallaCarga();
+  State<PantallaCarga> createState() => _EstadoCarga();
 }
 
-class _EstadoPantallaCarga extends State<PantallaCarga> {
-  
+class _EstadoCarga extends State<PantallaCarga> {
+  bool sesionLeida = false;
+  bool tieneSesion = false;
+  String nombreUsuario = '';
+
   @override
   void initState() {
     super.initState();
-    _navegarSiguientePantalla();
+    leerSesion();
   }
 
-  Future<void> _navegarSiguientePantalla() async {
-    await Future.delayed(const Duration(milliseconds: 2500));
-    
+  Future<void> leerSesion() async {
+    final activa = await haySesionActiva();
+    final nombre = await leerNombreUsuario();
     if (!mounted) return;
+    setState(() {
+      tieneSesion = activa;
+      nombreUsuario = nombre;
+      sesionLeida = true;
+    });
+  }
 
-    if (widget.tieneSesion) {
+  void entrarALaApp() {
+    if (tieneSesion) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PantallaLista()), 
+        MaterialPageRoute(builder: (ctx) => const PantallaPrincipal()),
       );
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PantallaIniciarSesion()),
+        MaterialPageRoute(builder: (ctx) => const PantallaIniciarSesion()),
       );
     }
+  }
+
+  String get lema {
+    if (tieneSesion) return 'Hola de nuevo, $nombreUsuario';
+    return 'Tus pagos, siempre bajo control';
+  }
+
+  String get estado {
+    if (tieneSesion) return 'Cargando tus suscripciones…';
+    return 'Preparando todo para tus suscripciones…';
+  }
+
+  Duration get duracion {
+    if (tieneSesion) return const Duration(milliseconds: 1500);
+    return const Duration(milliseconds: 2500);
   }
 
   @override
@@ -50,70 +69,59 @@ class _EstadoPantallaCarga extends State<PantallaCarga> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: Colores.degradadoFondo, 
-        ),
+        decoration: const BoxDecoration(gradient: degradadoMarca),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 72,
-                height: 72,
+                width: 80,
+                height: 80,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colores.superficie.withOpacity(0.22),
-                  shape: BoxShape.circle, 
+                  color: colorBlanco.withValues(alpha: 0.22),
+                  borderRadius: BorderRadius.circular(22),
                 ),
-                child: const Icon(
-                  Icons.sync,
-                  color: Colores.superficie,
-                  size: 36,
-                ),
+                child: const Icon(Icons.refresh, color: colorBlanco, size: 40),
               ),
-              
               const SizedBox(height: 24),
-              
               Text(
                 'Suscrip',
                 style: Tipografia.titulo1.copyWith(
-                  fontSize: 28,
-                  color: Colores.superficie,
+                  fontSize: 30,
+                  color: colorBlanco,
                 ),
               ),
-              
               const SizedBox(height: 8),
-              
               Text(
-                widget.tieneSesion ? 'Hola de nuevo, ${widget.nombreUsuario}' : 'Tus pagos, siempre bajo control',
-                style: Tipografia.textoCampo.copyWith(
-                  fontSize: 13,
-                  color: Colores.superficie.withOpacity(0.9),
-                ),
+                lema,
+                style: Tipografia.textoCampo.copyWith(color: colorBlanco),
               ),
-              
-              const SizedBox(height: 40),
-              
-              ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: SizedBox(
-                  width: 160,
-                  height: 4,
-                  child: LinearProgressIndicator(
-                    value: 0.35, 
-                    backgroundColor: Colores.superficie.withOpacity(0.35),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colores.superficie),
-                  ),
+              const SizedBox(height: 24),
+              if (sesionLeida)
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: duracion,
+                  onEnd: entrarALaApp,
+                  builder: (ctx, avance, hijo) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: SizedBox(
+                        width: 180,
+                        height: 4,
+                        child: LinearProgressIndicator(
+                          value: avance,
+                          backgroundColor: colorBlanco.withValues(alpha: 0.35),
+                          valueColor: const AlwaysStoppedAnimation<Color>(colorBlanco),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              ),
-              
               const SizedBox(height: 16),
-              
               Text(
-                widget.tieneSesion ? 'Cargando tus suscripciones...' : 'Preparando todo para tus suscripciones...',
-                style: Tipografia.textoAyuda.copyWith(
-                  fontSize: 12,
-                  color: Colores.superficie.withOpacity(0.9),
-                ),
+                estado,
+                style: Tipografia.textoAyuda.copyWith(color: colorBlanco),
               ),
             ],
           ),

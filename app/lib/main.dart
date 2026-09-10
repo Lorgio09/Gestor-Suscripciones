@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'colores.dart'; 
-import 'tipografia.dart'; 
-import 'pantalla/pantalla_lista.dart';
+import 'colores.dart';
+import 'tipografia.dart';
 import 'pantalla/pantalla_carga.dart';
 
 void main() {
@@ -15,7 +14,7 @@ class MiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gestor de Suscripciones',
+      title: 'Suscrip',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -23,87 +22,86 @@ class MiApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('es', 'BO'), 
+        Locale('es', 'BO'),
         Locale('es', 'ES'),
       ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colores.primario,
+          seedColor: colorCoral,
           brightness: Brightness.light,
         ),
-        fontFamily: 'PlusJakartaSans', 
-        scaffoldBackgroundColor: Colores.fondo,
-        
+        fontFamily: 'PlusJakartaSans',
+        scaffoldBackgroundColor: colorFondo,
+
         cardTheme: const CardThemeData(
-          color: Colores.superficie,
+          color: colorBlanco,
           elevation: 0,
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: Colores.borde),
+            side: BorderSide(color: colorBorde),
             borderRadius: BorderRadius.all(Radius.circular(14)),
           ),
         ),
-        
+
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colores.superficie,
+          fillColor: colorBlanco,
+          constraints: const BoxConstraints(minHeight: 50),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          hintStyle: Tipografia.textoAyuda,
-          prefixStyle: Tipografia.textoAyuda,
+          hintStyle: Tipografia.textoCampo.copyWith(color: colorPlaceholder),
+          prefixStyle: Tipografia.textoCampo.copyWith(color: colorTextoSecundario),
           errorStyle: const TextStyle(
             fontFamily: 'PlusJakartaSans',
-            fontSize: 16,
+            fontSize: 11,
             fontWeight: FontWeight.w400,
-            color: Colores.error,
+            color: colorError,
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Colores.borde),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: colorBorde),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Colores.borde),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: colorBorde),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Colores.primario),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: colorCoral),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Colores.error),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: colorError),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Colores.error),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: colorError),
           ),
         ),
-        
+
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.resolveWith((estados) {
-              if (estados.contains(WidgetState.disabled)) return Colores.botonDeshabilitado;
-              if (estados.contains(WidgetState.pressed)) return Colores.primario; 
-              return Colores.primario;
+              if (estados.contains(WidgetState.disabled)) return colorDeshabilitado;
+              if (estados.contains(WidgetState.pressed)) return colorCoralOscuro;
+              return colorCoral;
             }),
             foregroundColor: WidgetStateProperty.resolveWith((estados) {
-              if (estados.contains(WidgetState.disabled)) return Colores.textoDeshabilitado;
-              return Colores.superficie; 
+              if (estados.contains(WidgetState.disabled)) return colorPlaceholder;
+              return colorBlanco;
             }),
             elevation: WidgetStateProperty.all(0),
             textStyle: WidgetStateProperty.all(Tipografia.textoBoton),
-            padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(vertical: 15),
-            ),
+            minimumSize: WidgetStateProperty.all(const Size.fromHeight(52)),
             shape: WidgetStateProperty.all(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ),
-        
+
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            backgroundColor: Colores.superficie,
-            padding: const EdgeInsets.symmetric(vertical: 13),
+            backgroundColor: colorBlanco,
+            minimumSize: const Size.fromHeight(52),
             textStyle: Tipografia.etiqueta,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
