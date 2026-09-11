@@ -255,7 +255,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
               color: colorCoral,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.refresh, size: 20, color: colorBlanco),
+            child: const Icon(Icons.sync, size: 20, color: colorBlanco),
           ),
           const SizedBox(width: 12),
           Expanded(

@@ -83,7 +83,7 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
                     gradient: degradadoMarca,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.refresh, color: colorBlanco, size: 28),
+                  child: const Icon(Icons.sync, color: colorBlanco, size: 28),
                 ),
               ),
               const SizedBox(height: 16),

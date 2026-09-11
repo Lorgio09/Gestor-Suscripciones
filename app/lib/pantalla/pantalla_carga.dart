@@ -80,9 +80,9 @@ class _EstadoCarga extends State<PantallaCarga> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: colorBlanco.withValues(alpha: 0.22),
-                  borderRadius: BorderRadius.circular(22),
+                  shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.refresh, color: colorBlanco, size: 40),
+                child: const Icon(Icons.sync, color: colorBlanco, size: 40),
               ),
               const SizedBox(height: 24),
               Text(

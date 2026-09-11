@@ -105,7 +105,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                     gradient: degradadoMarca,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.refresh, color: colorBlanco, size: 28),
+                  child: const Icon(Icons.sync, color: colorBlanco, size: 28),
                 ),
               ),
               const SizedBox(height: 16),
