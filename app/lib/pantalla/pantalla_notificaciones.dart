@@ -74,6 +74,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
   bool avisosActivos = true;
   int diasAviso = 3;
   String horaAviso = '09:00';
+  String? errorMensaje;
 
   @override
   void initState() {
@@ -153,6 +154,12 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
   }
 
   Future<void> guardar() async {
+    setState(() {
+      errorMensaje = avisosActivos && controlMensaje.text.trim().isEmpty
+          ? 'Escribí el mensaje del aviso'
+          : null;
+    });
+    if (errorMensaje != null) return;
     if (usuario == null) return;
     await actualizarAvisos(
       usuario!.id!,
@@ -382,6 +389,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
                   minLines: 3,
                   style: Tipografia.textoCampo,
                   inputFormatters: [FormateadorVariables()],
+                  decoration: InputDecoration(errorText: errorMensaje),
                 ),
               ),
               const SizedBox(height: 8),

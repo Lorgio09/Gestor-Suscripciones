@@ -84,8 +84,19 @@ class _EstadoEditarCategoria extends State<PantallaEditarCategoria> {
   }
 
   Future<void> guardar() async {
+    final nombreNuevo = controlNombre.text.trim().toLowerCase();
+    final repetida = listaCategorias.any((otra) =>
+        otra.id != widget.categoria?.id &&
+        otra.nombre.trim().toLowerCase() == nombreNuevo);
+
     setState(() {
-      errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
+      if (controlNombre.text.isEmpty) {
+        errorNombre = 'Este campo es obligatorio';
+      } else if (repetida) {
+        errorNombre = 'Ya existe una categoría con ese nombre';
+      } else {
+        errorNombre = null;
+      }
     });
     if (errorNombre != null) return;
 

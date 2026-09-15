@@ -45,9 +45,22 @@ class _EstadoEditarPerfil extends State<PantallaEditarPerfil> {
   Future<void> guardarCambios() async {
     setState(() {
       errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
-      errorCorreo = controlCorreo.text.contains('@') ? null : 'Escribí un correo válido';
-      errorContrasena =
-          controlContrasena.text.length >= 6 ? null : 'Mínimo 6 caracteres';
+
+      if (controlCorreo.text.isEmpty) {
+        errorCorreo = 'Este campo es obligatorio';
+      } else if (!controlCorreo.text.contains('@')) {
+        errorCorreo = 'Escribí un correo válido';
+      } else {
+        errorCorreo = null;
+      }
+
+      if (controlContrasena.text.isEmpty) {
+        errorContrasena = 'Este campo es obligatorio';
+      } else if (controlContrasena.text.length < 6) {
+        errorContrasena = 'Mínimo 6 caracteres';
+      } else {
+        errorContrasena = null;
+      }
     });
     if (errorNombre != null || errorCorreo != null || errorContrasena != null) return;
     if (usuario == null) return;
