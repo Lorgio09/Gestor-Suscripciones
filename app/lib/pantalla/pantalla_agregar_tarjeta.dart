@@ -25,6 +25,8 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
   String tipoElegido = 'credito';
   Color colorElegido = coloresTarjeta.first;
   List<Color> coloresDisponibles = List.from(coloresTarjeta);
+  String? errorAlias;
+  String? errorDigitos;
 
   @override
   void initState() {
@@ -50,10 +52,6 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
 
   bool get esEdicion => widget.tarjeta != null;
 
-  bool get datosValidos {
-    return controlAlias.text.isNotEmpty && controlDigitos.text.length == 4;
-  }
-
   String get textoTipo {
     if (tipoElegido == 'debito') return 'Débito';
     if (tipoElegido == 'billetera') return 'Billetera móvil';
@@ -77,6 +75,19 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
   }
 
   Future<void> guardarTarjeta() async {
+    setState(() {
+      errorAlias = controlAlias.text.isEmpty ? 'Este campo es obligatorio' : null;
+
+      if (controlDigitos.text.isEmpty) {
+        errorDigitos = 'Este campo es obligatorio';
+      } else if (controlDigitos.text.length != 4) {
+        errorDigitos = 'Tienen que ser exactamente 4 dígitos';
+      } else {
+        errorDigitos = null;
+      }
+    });
+    if (errorAlias != null || errorDigitos != null) return;
+
     if (esEdicion) {
       widget.tarjeta!.alias = controlAlias.text;
       widget.tarjeta!.tipo = tipoElegido;
@@ -264,9 +275,10 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
               TextField(
                 controller: controlAlias,
                 style: Tipografia.textoCampo,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.account_balance, color: colorTextoSecundario, size: 20),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.account_balance, color: colorTextoSecundario, size: 20),
                   hintText: 'BCP, Yape, Soles…',
+                  errorText: errorAlias,
                 ),
               ),
               const SizedBox(height: 16),
@@ -290,10 +302,11 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
                 maxLength: 4,
                 style: Tipografia.textoCampo,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   counterText: '',
-                  prefixIcon: Icon(Icons.tag, color: colorTextoSecundario, size: 20),
+                  prefixIcon: const Icon(Icons.tag, color: colorTextoSecundario, size: 20),
                   hintText: '4521',
+                  errorText: errorDigitos,
                 ),
               ),
               const SizedBox(height: 8),
@@ -331,7 +344,7 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
               const SizedBox(height: 24),
 
               ElevatedButton(
-                onPressed: datosValidos ? guardarTarjeta : null,
+                onPressed: guardarTarjeta,
                 child: Text(esEdicion ? 'Guardar cambios' : 'Guardar tarjeta'),
               ),
 
