@@ -19,13 +19,13 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
   final controlContrasena = TextEditingController();
 
   bool ocultarContrasena = true;
+  String? errorNombre;
   String? errorCorreo;
+  String? errorContrasena;
 
   @override
   void initState() {
     super.initState();
-    controlNombre.addListener(refrescar);
-    controlCorreo.addListener(refrescar);
     controlContrasena.addListener(refrescar);
   }
 
@@ -33,13 +33,28 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
     setState(() {});
   }
 
-  bool get datosValidos {
-    return controlNombre.text.isNotEmpty &&
-        controlCorreo.text.contains('@') &&
-        controlContrasena.text.length >= 6;
-  }
-
   Future<void> crearCuenta() async {
+    setState(() {
+      errorNombre = controlNombre.text.isEmpty ? 'Este campo es obligatorio' : null;
+
+      if (controlCorreo.text.isEmpty) {
+        errorCorreo = 'Este campo es obligatorio';
+      } else if (!controlCorreo.text.contains('@')) {
+        errorCorreo = 'Escribí un correo válido';
+      } else {
+        errorCorreo = null;
+      }
+
+      if (controlContrasena.text.isEmpty) {
+        errorContrasena = 'Este campo es obligatorio';
+      } else if (controlContrasena.text.length < 6) {
+        errorContrasena = 'Mínimo 6 caracteres';
+      } else {
+        errorContrasena = null;
+      }
+    });
+    if (errorNombre != null || errorCorreo != null || errorContrasena != null) return;
+
     final repetido = await buscarUsuarioPorCorreo(controlCorreo.text);
     if (!mounted) return;
 
@@ -121,9 +136,10 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
               TextField(
                 controller: controlNombre,
                 style: Tipografia.textoCampo,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.person_outline, color: colorTextoSecundario, size: 20),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.person_outline, color: colorTextoSecundario, size: 20),
                   hintText: 'Princesa',
+                  errorText: errorNombre,
                 ),
               ),
               const SizedBox(height: 16),
@@ -151,6 +167,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outline, color: colorTextoSecundario, size: 20),
                   hintText: 'Mínimo 6 caracteres',
+                  errorText: errorContrasena,
                   suffixIcon: IconButton(
                     icon: Icon(
                       ocultarContrasena ? Icons.visibility_off : Icons.visibility,
@@ -165,17 +182,19 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                faltan > 0
-                    ? 'Mínimo 6 caracteres · te faltan $faltan'
-                    : 'Contraseña lista',
-                style: Tipografia.textoAyuda,
-              ),
+              if (controlContrasena.text.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  faltan > 0
+                      ? 'Mínimo 6 caracteres · te faltan $faltan'
+                      : 'Contraseña lista',
+                  style: Tipografia.textoAyuda,
+                ),
+              ],
               const SizedBox(height: 24),
 
               ElevatedButton(
-                onPressed: datosValidos ? crearCuenta : null,
+                onPressed: crearCuenta,
                 child: const Text('Crear cuenta'),
               ),
               const SizedBox(height: 16),

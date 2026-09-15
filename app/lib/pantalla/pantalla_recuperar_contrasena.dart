@@ -23,6 +23,13 @@ class _EstadoRecuperarContrasena extends State<PantallaRecuperarContrasena> {
       errorCorreo = null;
     });
 
+    if (controlCorreo.text.isEmpty) {
+      setState(() {
+        errorCorreo = 'Este campo es obligatorio';
+      });
+      return;
+    }
+
     if (!controlCorreo.text.contains('@')) {
       setState(() {
         errorCorreo = 'Escribí un correo válido';

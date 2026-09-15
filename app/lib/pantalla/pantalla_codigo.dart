@@ -73,9 +73,14 @@ class _EstadoCodigo extends State<PantallaCodigo> {
       await enviarCodigo(widget.correo, nuevoCodigo);
     } catch (falla) {
       if (!mounted) return;
-      setState(() {
-        errorCodigo = 'No pudimos reenviar el correo';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No pudimos reenviar el correo, revisá tu conexión',
+            style: Tipografia.textoCampo.copyWith(color: colorBlanco),
+          ),
+        ),
+      );
       return;
     }
 
@@ -91,6 +96,13 @@ class _EstadoCodigo extends State<PantallaCodigo> {
   }
 
   Widget cajaDigito(int posicion) {
+    final bordeError = errorCodigo != null
+        ? OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: colorError),
+          )
+        : null;
+
     return SizedBox(
       width: 48,
       height: 56,
@@ -103,9 +115,11 @@ class _EstadoCodigo extends State<PantallaCodigo> {
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         style: Tipografia.numerico.copyWith(fontSize: 22),
         onChanged: (texto) => moverFoco(posicion, texto),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           counterText: '',
           contentPadding: EdgeInsets.zero,
+          enabledBorder: bordeError,
+          focusedBorder: bordeError,
         ),
       ),
     );

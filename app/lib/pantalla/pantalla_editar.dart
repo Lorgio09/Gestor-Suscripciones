@@ -116,7 +116,8 @@ class _EstadoEditar extends State<PantallaEditar> {
 
       if (controlCosto.text.isEmpty) {
         errorCosto = 'Este campo es obligatorio';
-      } else if (double.tryParse(controlCosto.text) == null) {
+      } else if (double.tryParse(controlCosto.text) == null ||
+          double.parse(controlCosto.text) <= 0) {
         errorCosto = 'Ingrese un número, por ejemplo 51.90';
       } else {
         errorCosto = null;
@@ -152,6 +153,8 @@ class _EstadoEditar extends State<PantallaEditar> {
       idTarjeta: idTarjetaElegida,
       idCategoria: widget.pago.idCategoria,
       motivoCancelacion: widget.pago.motivoCancelacion,
+      fechaInicio: widget.pago.fechaInicio,
+      fechaUltimoAviso: widget.pago.fechaUltimoAviso,
     );
 
     await actualizarPago(widget.pago.id!, pagoEditado);
@@ -169,7 +172,7 @@ class _EstadoEditar extends State<PantallaEditar> {
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: colorCoral, 
-              onPrimary: Colors.white,
+              onPrimary: colorBlanco,
               onSurface: colorTexto,
             ),
           ),
@@ -224,8 +227,8 @@ class _EstadoEditar extends State<PantallaEditar> {
                 decoration: InputDecoration(
                   hintText: 'Ej. Netflix',
                   errorText: errorNombre,
-                  prefixIcon: const Icon(Icons.local_offer_outlined,
-                      size: 16, color: colorTextoSecundario),
+                  prefixIcon: const Icon(Icons.sell_outlined,
+                      size: 20, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -254,8 +257,8 @@ class _EstadoEditar extends State<PantallaEditar> {
                 decoration: InputDecoration(
                   hintText: 'DD / MM / AAAA',
                   errorText: errorFecha,
-                  prefixIcon: const Icon(Icons.calendar_today_outlined,
-                      size: 16, color: colorTextoSecundario),
+                  prefixIcon: const Icon(Icons.calendar_today,
+                      size: 20, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -270,7 +273,7 @@ class _EstadoEditar extends State<PantallaEditar> {
                   hintText: 'https://...',
                   errorText: errorUrl,
                   prefixIcon: const Icon(Icons.link,
-                      size: 16, color: colorTextoSecundario),
+                      size: 20, color: colorTextoSecundario),
                 ),
               ),
               const SizedBox(height: 16),
@@ -311,10 +314,9 @@ class _EstadoEditar extends State<PantallaEditar> {
 
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: guardarCambios,
-                  icon: const Icon(Icons.check, size: 16),
-                  label: const Text('Guardar cambios'),
+                  child: const Text('Guardar cambios'),
                 ),
               ),
               const SizedBox(height: 24),

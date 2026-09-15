@@ -25,9 +25,11 @@ class _EstadoNuevaContrasena extends State<PantallaNuevaContrasena> {
   Future<void> guardarContrasena() async {
     setState(() {
       errorNueva = controlNueva.text.length < 6 ? 'Mínimo 6 caracteres' : null;
-      errorRepetir = controlRepetir.text == controlNueva.text
-          ? null
-          : 'Las dos contraseñas tienen que ser iguales';
+      errorRepetir = controlRepetir.text.isEmpty
+          ? 'Este campo es obligatorio'
+          : (controlRepetir.text == controlNueva.text
+              ? null
+              : 'Las dos contraseñas tienen que ser iguales');
     });
     if (errorNueva != null || errorRepetir != null) return;
 

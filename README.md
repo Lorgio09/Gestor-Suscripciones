@@ -7,4 +7,6 @@ Claure Cota Ariany
 Tipo de proyecto: App movil.
 Modalidad: Sin IA.
 
+Diseño en Figma: https://www.figma.com/design/wsr1LkxXeoTzQbnBXcAcCi/IHC
+
 Problema inicial: Las personas olvidan cancelar sus suscripciones digitales a tiempo, lo que genera una pérdida de dinero mensual constante por servicios que no utilizan.

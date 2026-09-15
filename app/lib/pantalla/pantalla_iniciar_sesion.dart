@@ -24,8 +24,8 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
 
   Future<void> iniciarSesion() async {
     setState(() {
-      errorCorreo = controlCorreo.text.isEmpty ? 'Escribí tu correo' : null;
-      errorContrasena = controlContrasena.text.isEmpty ? 'Escribí tu contraseña' : null;
+      errorCorreo = controlCorreo.text.isEmpty ? 'Este campo es obligatorio' : null;
+      errorContrasena = controlContrasena.text.isEmpty ? 'Este campo es obligatorio' : null;
     });
     if (errorCorreo != null || errorContrasena != null) return;
 

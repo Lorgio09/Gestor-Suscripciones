@@ -34,15 +34,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
   @override
   void initState() {
     super.initState();
-    controlNombre.addListener(refrescar);
-    controlCosto.addListener(refrescar);
-    controlFecha.addListener(refrescar);
-    controlUrl.addListener(refrescar);
     cargarTarjetas();
-  }
-
-  void refrescar() {
-    setState(() {});
   }
 
   Future<void> cargarTarjetas() async {
@@ -51,14 +43,6 @@ class _EstadoRegistro extends State<PantallaRegistro> {
     setState(() {
       listaTarjetas = datos;
     });
-  }
-
-  bool get camposCompletos {
-    return controlNombre.text.isNotEmpty &&
-        controlCosto.text.isNotEmpty &&
-        controlFecha.text.isNotEmpty &&
-        controlUrl.text.isNotEmpty &&
-        idTarjetaElegida != null;
   }
 
   Future<void> irAAgregarTarjeta() async {
@@ -84,7 +68,8 @@ class _EstadoRegistro extends State<PantallaRegistro> {
 
       if (controlCosto.text.isEmpty) {
         errorCosto = 'Este campo es obligatorio';
-      } else if (double.tryParse(controlCosto.text) == null) {
+      } else if (double.tryParse(controlCosto.text) == null ||
+          double.parse(controlCosto.text) <= 0) {
         errorCosto = 'Ingrese un número, por ejemplo 51.90';
       } else {
         errorCosto = null;
@@ -320,7 +305,7 @@ class _EstadoRegistro extends State<PantallaRegistro> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: camposCompletos ? guardarNuevoPago : null,
+                  onPressed: guardarNuevoPago,
                   child: const Text('Guardar pago'),
                 ),
               ),
