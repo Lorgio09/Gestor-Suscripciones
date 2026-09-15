@@ -50,12 +50,7 @@ class MiApp extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           hintStyle: Tipografia.textoCampo.copyWith(color: colorPlaceholder),
           prefixStyle: Tipografia.textoCampo.copyWith(color: colorTextoSecundario),
-          errorStyle: const TextStyle(
-            fontFamily: 'PlusJakartaSans',
-            fontSize: 11,
-            fontWeight: FontWeight.w400,
-            color: colorError,
-          ),
+          errorStyle: Tipografia.textoAyuda.copyWith(color: colorError),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: colorBorde),

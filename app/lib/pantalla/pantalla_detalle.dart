@@ -58,7 +58,7 @@ class _EstadoDetalle extends State<PantallaDetalle> with WidgetsBindingObserver 
       context: context,
       builder: (contexto) => AlertDialog(
         backgroundColor: colorBlanco,
-        title: Text('¿Pagaste ${pago.nombre}?', style: Tipografia.titulo1.copyWith(fontSize: 18)),
+        title: Text('¿Pagaste ${pago.nombre}?', style: Tipografia.tituloDialogo),
         content: Text(
           'Si todavía no lo pagaste la dejamos como pendiente.',
           style: Tipografia.textoCampo,
@@ -146,7 +146,7 @@ class _EstadoDetalle extends State<PantallaDetalle> with WidgetsBindingObserver 
     );
   }
 
-  Widget badgeEstado() {
+  Widget etiquetaEstado() {
     Color fondo = colorExitoSuave;
     Color letra = colorExito;
     IconData icono = Icons.check;
@@ -188,7 +188,7 @@ class _EstadoDetalle extends State<PantallaDetalle> with WidgetsBindingObserver 
             const Spacer(),
             Text(
               valor,
-              style: Tipografia.numerico.copyWith(fontSize: 15, color: colorValor),
+              style: Tipografia.montoFila.copyWith(color: colorValor),
             ),
           ],
         ),
@@ -228,7 +228,7 @@ class _EstadoDetalle extends State<PantallaDetalle> with WidgetsBindingObserver 
                     const SizedBox(height: 16),
                     Text(pago.nombre, style: Tipografia.titulo1),
                     const SizedBox(height: 8),
-                    badgeEstado(),
+                    etiquetaEstado(),
                   ],
                 ),
               ),

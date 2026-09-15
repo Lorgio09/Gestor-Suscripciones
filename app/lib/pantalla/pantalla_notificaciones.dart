@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../almacen/almacen_usuarios.dart';
-import '../avisos.dart';
 import '../correo.dart';
 import '../colores.dart';
 import '../modelos/usuario.dart';
@@ -69,6 +68,7 @@ class PantallaNotificaciones extends StatefulWidget {
 
 class _EstadoNotificaciones extends State<PantallaNotificaciones> {
   late ControlMensaje controlMensaje;
+  final controlHora = TextEditingController();
 
   Usuario? usuario;
   bool avisosActivos = true;
@@ -97,6 +97,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
       avisosActivos = encontrado.avisosActivos;
       diasAviso = encontrado.diasAviso;
       horaAviso = encontrado.horaAviso;
+      controlHora.text = encontrado.horaAviso;
       controlMensaje.text = encontrado.mensajeAviso;
     });
   }
@@ -150,6 +151,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
     setState(() {
       horaAviso = '${horaElegida.hour.toString().padLeft(2, '0')}:'
           '${horaElegida.minute.toString().padLeft(2, '0')}';
+      controlHora.text = horaAviso;
     });
   }
 
@@ -168,7 +170,6 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
       horaAviso,
       controlMensaje.text,
     );
-    await programarAvisosLocales();
     if (!mounted) return;
     Navigator.pop(context);
   }
@@ -179,7 +180,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
     try {
       await enviarCorreo(
         usuario!.correo,
-        'Netflix vence en $diasAviso días',
+        'Netflix vence en $diasAviso ${diasAviso == 1 ? "día" : "días"}',
         mensajeConEjemplos,
       );
     } catch (falla) {
@@ -233,7 +234,6 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
           child: Text(
             variable,
             style: Tipografia.textoAyuda.copyWith(
-              fontSize: 11,
               color: colorCoral,
               fontWeight: FontWeight.w600,
             ),
@@ -271,11 +271,11 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
               children: [
                 Text(
                   'Suscrip · ahora',
-                  style: Tipografia.textoAyuda.copyWith(fontSize: 11),
+                  style: Tipografia.textoAyuda,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Netflix vence en $diasAviso días',
+                  'Netflix vence en $diasAviso ${diasAviso == 1 ? "día" : "días"}',
                   style: Tipografia.textoCampo.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -294,6 +294,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
   @override
   void dispose() {
     controlMensaje.dispose();
+    controlHora.dispose();
     super.dispose();
   }
 
@@ -332,7 +333,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
                           const SizedBox(height: 8),
                           Text(
                             'Se aplica a todas las suscripciones',
-                            style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+                            style: Tipografia.textoChico,
                           ),
                         ],
                       ),
@@ -367,7 +368,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
                 readOnly: true,
                 enabled: avisosActivos,
                 onTap: elegirHora,
-                controller: TextEditingController(text: horaAviso),
+                controller: controlHora,
                 style: Tipografia.textoCampo,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.access_time, color: colorTextoSecundario, size: 20),
@@ -395,7 +396,7 @@ class _EstadoNotificaciones extends State<PantallaNotificaciones> {
               const SizedBox(height: 8),
               Text(
                 'Tocá una variable para insertarla:',
-                style: Tipografia.textoAyuda.copyWith(fontSize: 11),
+                style: Tipografia.textoAyuda,
               ),
               const SizedBox(height: 8),
               SingleChildScrollView(

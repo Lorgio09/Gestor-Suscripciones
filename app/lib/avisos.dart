@@ -43,7 +43,7 @@ Future<void> revisarAvisos() async {
     try {
       await enviarCorreo(
         usuario.correo,
-        '${pago.nombre} vence en $dias días',
+        '${pago.nombre} vence en $dias ${dias == 1 ? "día" : "días"}',
         armarMensaje(usuario.mensajeAviso, pago, tarjeta),
       );
       await marcarAvisoEnviado(pago.id!, proximo);
@@ -53,6 +53,5 @@ Future<void> revisarAvisos() async {
   }
 }
 
-Future<void> programarAvisosLocales() async {
-  // Acá va flutter_local_notifications para que el aviso salga a la hora elegida.
-}
+// Para una versión futura: aviso local a la hora elegida con flutter_local_notifications.
+Future<void> programarAvisosLocales() async {}

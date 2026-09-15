@@ -24,7 +24,14 @@ class _EstadoNuevaContrasena extends State<PantallaNuevaContrasena> {
 
   Future<void> guardarContrasena() async {
     setState(() {
-      errorNueva = controlNueva.text.length < 6 ? 'Mínimo 6 caracteres' : null;
+      if (controlNueva.text.isEmpty) {
+        errorNueva = 'Este campo es obligatorio';
+      } else if (controlNueva.text.length < 6) {
+        errorNueva = 'Mínimo 6 caracteres';
+      } else {
+        errorNueva = null;
+      }
+
       errorRepetir = controlRepetir.text.isEmpty
           ? 'Este campo es obligatorio'
           : (controlRepetir.text == controlNueva.text

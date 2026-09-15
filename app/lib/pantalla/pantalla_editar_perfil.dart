@@ -65,6 +65,15 @@ class _EstadoEditarPerfil extends State<PantallaEditarPerfil> {
     if (errorNombre != null || errorCorreo != null || errorContrasena != null) return;
     if (usuario == null) return;
 
+    final repetido = await buscarUsuarioPorCorreo(controlCorreo.text);
+    if (!mounted) return;
+    if (repetido != null && repetido.id != usuario!.id) {
+      setState(() {
+        errorCorreo = 'Ese correo ya tiene una cuenta';
+      });
+      return;
+    }
+
     usuario!.nombre = controlNombre.text;
     usuario!.correo = controlCorreo.text;
     usuario!.contrasena = controlContrasena.text;

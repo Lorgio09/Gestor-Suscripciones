@@ -62,7 +62,7 @@ class GraficoTorta extends StatelessWidget {
         Expanded(
           child: Text(
             porcion.etiqueta,
-            style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+            style: Tipografia.textoChico,
             overflow: TextOverflow.ellipsis,
           ),
         ),

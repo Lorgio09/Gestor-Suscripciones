@@ -39,12 +39,54 @@ class Tipografia {
     fontFamily: 'PlusJakartaSans',
     fontSize: 13,
     fontWeight: FontWeight.w600,
-    color: Colors.white, 
+    color: colorBlanco,
   );
   
   static const TextStyle numerico = TextStyle(
     fontFamily: 'Sora',
     fontSize: 16,
+    fontWeight: FontWeight.w700,
+    color: colorTexto,
+  );
+
+  static const TextStyle titulo2 = TextStyle(
+    fontFamily: 'Sora',
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: colorTexto,
+  );
+
+  static const TextStyle tituloDialogo = TextStyle(
+    fontFamily: 'Sora',
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: colorTexto,
+  );
+
+  static const TextStyle textoCampoFuerte = TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: colorTexto,
+  );
+
+  static const TextStyle textoChico = TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: colorTextoSecundario,
+  );
+
+  static const TextStyle saludo = TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    color: colorTextoSecundario,
+  );
+
+  static const TextStyle montoFila = TextStyle(
+    fontFamily: 'Sora',
+    fontSize: 15,
     fontWeight: FontWeight.w700,
     color: colorTexto,
   );

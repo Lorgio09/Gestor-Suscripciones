@@ -75,7 +75,7 @@ class _EstadoHojaReasignar extends State<HojaReasignar> {
         children: [
           Text(
             widget.titulo,
-            style: Tipografia.titulo1.copyWith(fontSize: 18),
+            style: Tipografia.tituloDialogo,
           ),
           const SizedBox(height: 8),
           Text(

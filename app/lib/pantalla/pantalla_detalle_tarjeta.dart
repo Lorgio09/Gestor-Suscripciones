@@ -98,13 +98,13 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
               children: [
                 Text(
                   pago.nombre,
-                  style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
+                  style: Tipografia.textoCampoFuerte,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Desde ${mesYAnio(pago.fechaInicio)} · '
                   '${meses == 1 ? "1 mes" : "$meses meses"}',
-                  style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+                  style: Tipografia.textoChico,
                 ),
               ],
             ),
@@ -115,7 +115,7 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
             children: [
               Text(
                 'Bs ${total.toStringAsFixed(2)}',
-                style: Tipografia.numerico.copyWith(fontSize: 15),
+                style: Tipografia.montoFila,
               ),
               const SizedBox(height: 8),
               Text('total', style: Tipografia.textoAyuda),
@@ -139,7 +139,7 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
         ),
         title: Text(
           '${tarjeta.alias} •••• ${tarjeta.ultimosDigitos}',
-          style: Tipografia.titulo1.copyWith(fontSize: 20),
+          style: Tipografia.titulo2,
         ),
         actions: [
           IconButton(

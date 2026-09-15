@@ -129,10 +129,7 @@ class _EstadoBilletera extends State<PantallaBilletera> {
               const SizedBox(height: 24),
               Text(
                 'Hola, $nombreUsuario',
-                style: Tipografia.etiqueta.copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: colorTextoSecundario,
-                ),
+                style: Tipografia.saludo,
               ),
               const SizedBox(height: 8),
               const Text('Mi billetera', style: Tipografia.titulo1),
@@ -154,10 +151,7 @@ class _EstadoBilletera extends State<PantallaBilletera> {
               const SizedBox(height: 24),
               Text(
                 'Hola, $nombreUsuario',
-                style: Tipografia.etiqueta.copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: colorTextoSecundario,
-                ),
+                style: Tipografia.saludo,
               ),
               const SizedBox(height: 8),
               const Text('Mi billetera', style: Tipografia.titulo1),
@@ -176,7 +170,7 @@ class _EstadoBilletera extends State<PantallaBilletera> {
                       color: hexaAColor(tarjeta.color),
                       textoAbajoIzquierda: pagosActivosDe(tarjeta).isEmpty
                           ? 'Sin pagos todavía'
-                          : '${pagosActivosDe(tarjeta).length} suscripciones',
+                          : '${pagosActivosDe(tarjeta).length} ${pagosActivosDe(tarjeta).length == 1 ? "suscripción" : "suscripciones"}',
                       textoAbajoDerecha: pagosActivosDe(tarjeta).isEmpty
                           ? ''
                           : 'Bs ${calcularGastoTarjeta(tarjeta).toStringAsFixed(2)} /mes',
@@ -198,7 +192,7 @@ class _EstadoBilletera extends State<PantallaBilletera> {
                     const Spacer(),
                     Text(
                       'Bs ${totalDelMes.toStringAsFixed(2)}',
-                      style: Tipografia.numerico.copyWith(fontSize: 15),
+                      style: Tipografia.montoFila,
                     ),
                   ],
                 ),

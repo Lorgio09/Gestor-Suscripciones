@@ -10,15 +10,6 @@ import 'dialogo_color.dart';
 import 'encabezado.dart';
 import 'hoja_reasignar.dart';
 
-const coloresCategoria = [
-  Color(0xFFF26B5B),
-  Color(0xFF1F4E8C),
-  Color(0xFF2E7D4F),
-  Color(0xFF7B2CBF),
-  Color(0xFFD98A1E),
-  Color(0xFF2B2B2B),
-];
-
 class PantallaEditarCategoria extends StatefulWidget {
   final Categoria? categoria;
 
@@ -34,8 +25,8 @@ class _EstadoEditarCategoria extends State<PantallaEditarCategoria> {
   List<Pago> listaPagos = [];
   List<Categoria> listaCategorias = [];
   List<int> idsMarcados = [];
-  List<Color> coloresDisponibles = List.from(coloresCategoria);
-  Color colorElegido = coloresCategoria.first;
+  List<Color> coloresDisponibles = List.from(coloresTarjeta);
+  Color colorElegido = coloresTarjeta.first;
   String? errorNombre;
 
   @override
@@ -183,7 +174,7 @@ class _EstadoEditarCategoria extends State<PantallaEditarCategoria> {
       ),
       builder: (contexto) => HojaReasignar(
         titulo: '¿Eliminar ${categoria.nombre}?',
-        texto: 'Tiene ${adentro.length} suscripciones. '
+        texto: 'Tiene ${adentro.length} ${adentro.length == 1 ? "suscripción" : "suscripciones"}. '
             'Los pagos no se borran: elegí a dónde pasarlos.',
         opciones: opciones,
         idPorDefecto: sinCategoria!.id!,
@@ -272,13 +263,13 @@ class _EstadoEditarCategoria extends State<PantallaEditarCategoria> {
                 children: [
                   Text(
                     pago.nombre,
-                    style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
+                    style: Tipografia.textoCampoFuerte,
                   ),
                   if (esDeOtra) ...[
                     const SizedBox(height: 8),
                     Text(
                       'En $otra',
-                      style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+                      style: Tipografia.textoChico,
                     ),
                   ],
                 ],
@@ -287,7 +278,7 @@ class _EstadoEditarCategoria extends State<PantallaEditarCategoria> {
             const SizedBox(width: 12),
             Text(
               'Bs ${pago.costo.toStringAsFixed(2)}',
-              style: Tipografia.numerico.copyWith(fontSize: 15),
+              style: Tipografia.montoFila,
             ),
           ],
         ),
@@ -376,7 +367,7 @@ class _EstadoEditarCategoria extends State<PantallaEditarCategoria> {
               ),
 
               if (!esNueva && !esFija) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Center(
                   child: TextButton(
                     onPressed: eliminar,

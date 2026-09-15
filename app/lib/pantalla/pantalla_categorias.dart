@@ -138,14 +138,14 @@ class _EstadoCategorias extends State<PantallaCategorias> {
                   children: [
                     Text(
                       categoria.nombre,
-                      style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
+                      style: Tipografia.textoCampoFuerte,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       fija
                           ? 'Fija · no se puede borrar'
-                          : '$cantidad suscripciones · Bs ${montoDe(categoria).toStringAsFixed(2)}',
-                      style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+                          : '$cantidad ${cantidad == 1 ? "suscripción" : "suscripciones"} · Bs ${montoDe(categoria).toStringAsFixed(2)}',
+                      style: Tipografia.textoChico,
                     ),
                   ],
                 ),

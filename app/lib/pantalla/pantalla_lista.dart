@@ -46,6 +46,7 @@ class _EstadoLista extends State<PantallaLista> {
   double get gastoMensual {
     double total = 0;
     for (final pago in listaPagos) {
+      if (pago.estado == 'cancelada') continue;
       total = total + pago.costo;
     }
     return total;
@@ -54,6 +55,7 @@ class _EstadoLista extends State<PantallaLista> {
   int get diasParaElProximoCobro {
     int menor = 999;
     for (final pago in listaPagos) {
+      if (pago.estado == 'cancelada') continue;
       final dias = diasHastaCobro(calcularProximoPago(pago.fecha));
       if (dias < menor) menor = dias;
     }
@@ -86,6 +88,9 @@ class _EstadoLista extends State<PantallaLista> {
   }
 
   Widget resumen() {
+    final activas = listaPagos.where((pago) => pago.estado != 'cancelada').length;
+    final dias = diasParaElProximoCobro;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -98,7 +103,7 @@ class _EstadoLista extends State<PantallaLista> {
         children: [
           Text(
             'Gasto mensual total',
-            style: Tipografia.textoAyuda.copyWith(fontSize: 12, color: colorBlanco),
+            style: Tipografia.textoChico.copyWith(color: colorBlanco),
           ),
           const SizedBox(height: 8),
           Text(
@@ -107,8 +112,8 @@ class _EstadoLista extends State<PantallaLista> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${listaPagos.length} activas · próximo cobro en $diasParaElProximoCobro días',
-            style: Tipografia.textoAyuda.copyWith(fontSize: 12, color: colorBlanco),
+            '$activas ${activas == 1 ? "activa" : "activas"} · próximo cobro en $dias ${dias == 1 ? "día" : "días"}',
+            style: Tipografia.textoChico.copyWith(color: colorBlanco),
           ),
         ],
       ),
@@ -153,12 +158,12 @@ class _EstadoLista extends State<PantallaLista> {
                   children: [
                     Text(
                       pago.nombre,
-                      style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
+                      style: Tipografia.textoCampoFuerte,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       detalle,
-                      style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+                      style: Tipografia.textoChico,
                     ),
                   ],
                 ),
@@ -169,7 +174,7 @@ class _EstadoLista extends State<PantallaLista> {
                 children: [
                   Text(
                     'Bs ${pago.costo.toStringAsFixed(2)}',
-                    style: Tipografia.numerico.copyWith(fontSize: 15),
+                    style: Tipografia.montoFila,
                   ),
                   const SizedBox(height: 8),
                   Text('/mes', style: Tipografia.textoAyuda),
@@ -194,10 +199,7 @@ class _EstadoLista extends State<PantallaLista> {
               const SizedBox(height: 24),
               Text(
                 'Hola, $nombreUsuario',
-                style: Tipografia.etiqueta.copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: colorTextoSecundario,
-                ),
+                style: Tipografia.saludo,
               ),
               const SizedBox(height: 8),
               const Text('Mis suscripciones', style: Tipografia.titulo1),

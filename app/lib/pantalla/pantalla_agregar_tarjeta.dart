@@ -123,7 +123,7 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
           backgroundColor: colorBlanco,
           title: Text(
             '¿Eliminar ${tarjeta.alias} •••• ${tarjeta.ultimosDigitos}?',
-            style: Tipografia.titulo1.copyWith(fontSize: 18),
+            style: Tipografia.tituloDialogo,
           ),
           content: Text('No tiene suscripciones.', style: Tipografia.textoCampo),
           actions: [
@@ -171,7 +171,7 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
       ),
       builder: (contexto) => HojaReasignar(
         titulo: '¿Eliminar ${tarjeta.alias} •••• ${tarjeta.ultimosDigitos}?',
-        texto: 'Tiene ${adentro.length} suscripciones. '
+        texto: 'Tiene ${adentro.length} ${adentro.length == 1 ? "suscripción" : "suscripciones"}. '
             'Los pagos no se borran: elegí a qué tarjeta pasarlos.',
         opciones: opciones,
         idPorDefecto: 0,
@@ -309,11 +309,13 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
                   errorText: errorDigitos,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Solo los últimos cuatro. No guardamos el número completo.',
-                style: Tipografia.textoAyuda,
-              ),
+              if (errorDigitos == null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Solo los últimos cuatro. No guardamos el número completo.',
+                  style: Tipografia.textoAyuda,
+                ),
+              ],
               const SizedBox(height: 16),
 
               Text('Color', style: Tipografia.etiqueta),
@@ -349,7 +351,7 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
               ),
 
               if (esEdicion) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Center(
                   child: TextButton(
                     onPressed: eliminar,

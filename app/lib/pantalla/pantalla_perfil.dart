@@ -115,12 +115,12 @@ class _EstadoPerfil extends State<PantallaPerfil> {
                   children: [
                     Text(
                       titulo,
-                      style: Tipografia.textoCampo.copyWith(fontWeight: FontWeight.w600),
+                      style: Tipografia.textoCampoFuerte,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       subtitulo,
-                      style: Tipografia.textoAyuda.copyWith(fontSize: 12),
+                      style: Tipografia.textoChico,
                     ),
                   ],
                 ),
@@ -157,7 +157,7 @@ class _EstadoPerfil extends State<PantallaPerfil> {
                 const SizedBox(height: 8),
                 Text(
                   'Tu tranquilidad financiera, en tus manos.',
-                  style: Tipografia.textoAyuda.copyWith(fontSize: 12, color: colorBlanco),
+                  style: Tipografia.textoChico.copyWith(color: colorBlanco),
                 ),
               ],
             ),
@@ -204,7 +204,7 @@ class _EstadoPerfil extends State<PantallaPerfil> {
             const SizedBox(height: 16),
             Text(
               usuario == null ? '' : usuario!.nombre,
-              style: Tipografia.titulo1.copyWith(fontSize: 20),
+              style: Tipografia.titulo2,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -252,10 +252,7 @@ class _EstadoPerfil extends State<PantallaPerfil> {
                     Expanded(
                       child: Text(
                         'Cerrar sesión',
-                        style: Tipografia.textoCampo.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorError,
-                        ),
+                        style: Tipografia.textoCampoFuerte.copyWith(color: colorError),
                       ),
                     ),
                   ],

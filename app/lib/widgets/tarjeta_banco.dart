@@ -57,12 +57,12 @@ class TarjetaBanco extends StatelessWidget {
               Expanded(
                 child: Text(
                   textoAbajoIzquierda,
-                  style: Tipografia.textoAyuda.copyWith(fontSize: 12, color: colorBlanco),
+                  style: Tipografia.textoChico.copyWith(color: colorBlanco),
                 ),
               ),
               Text(
                 textoAbajoDerecha,
-                style: Tipografia.numerico.copyWith(fontSize: 15, color: colorBlanco),
+                style: Tipografia.montoFila.copyWith(color: colorBlanco),
               ),
             ],
           ),
