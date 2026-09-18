@@ -215,7 +215,11 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
     final elegido = colorElegido == color;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: InkWell(
+      child: Semantics(
+        label: 'Color ${colorAHexa(color)}',
+        button: true,
+        selected: elegido,
+        child: InkWell(
         onTap: () => setState(() => colorElegido = color),
         customBorder: const CircleBorder(),
         child: Container(
@@ -226,6 +230,7 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
             shape: BoxShape.circle,
             border: elegido ? Border.all(color: colorTexto, width: 3) : null,
           ),
+        ),
         ),
       ),
     );
@@ -325,19 +330,23 @@ class _EstadoAgregarTarjeta extends State<PantallaAgregarTarjeta> {
                 child: Row(
                   children: [
                     for (final color in coloresDisponibles) circuloColor(color),
-                    InkWell(
-                      onTap: elegirOtroColor,
-                      customBorder: const CircleBorder(),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: colorBlanco,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: colorBorde),
+                    Semantics(
+                      label: 'Elegir otro color',
+                      button: true,
+                      child: InkWell(
+                        onTap: elegirOtroColor,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: colorBlanco,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: colorBorde),
+                          ),
+                          child: const Icon(Icons.add, size: 18, color: colorTextoSecundario),
                         ),
-                        child: const Icon(Icons.add, size: 18, color: colorTextoSecundario),
                       ),
                     ),
                   ],

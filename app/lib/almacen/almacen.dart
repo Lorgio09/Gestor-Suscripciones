@@ -15,7 +15,10 @@ const sqlTablaPagos = 'CREATE TABLE pagos ('
     'idCategoria INTEGER, '
     'motivoCancelacion TEXT, '
     'fechaInicio TEXT, '
-    'fechaUltimoAviso TEXT)';
+    'fechaUltimoAviso TEXT, '
+    'fechaCancelacion TEXT, '
+    'fechaUltimoPago TEXT, '
+    'color TEXT)';
 
 const sqlTablaUsuarios = 'CREATE TABLE usuarios ('
     'id INTEGER PRIMARY KEY AUTOINCREMENT, '
@@ -64,7 +67,7 @@ Future<Database> abrirBase() async {
   final ruta = join(await getDatabasesPath(), 'suscripciones.db');
   baseDatos = await openDatabase(
     ruta,
-    version: 5,
+    version: 7,
     onCreate: (base, version) async {
       await base.execute(sqlTablaPagos);
       await base.execute(sqlTablaUsuarios);
@@ -94,6 +97,13 @@ Future<Database> abrirBase() async {
         await base.execute('ALTER TABLE pagos ADD COLUMN fechaInicio TEXT');
         await base.execute('ALTER TABLE pagos ADD COLUMN fechaUltimoAviso TEXT');
         await base.execute('UPDATE pagos SET fechaInicio = fecha WHERE fechaInicio IS NULL');
+      }
+      if (versionVieja < 6) {
+        await base.execute('ALTER TABLE pagos ADD COLUMN fechaCancelacion TEXT');
+        await base.execute('ALTER TABLE pagos ADD COLUMN fechaUltimoPago TEXT');
+      }
+      if (versionVieja < 7) {
+        await base.execute('ALTER TABLE pagos ADD COLUMN color TEXT');
       }
     },
   );

@@ -47,7 +47,7 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
         .map((pago) => Porcion(
               etiqueta: pago.nombre,
               monto: pago.costo,
-              color: colorPorNombre(pago.nombre),
+              color: colorDePago(pago),
             ))
         .toList();
     return agruparEnOtros(todas);
@@ -83,7 +83,7 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: colorPorNombre(pago.nombre),
+              color: colorDePago(pago),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
@@ -134,6 +134,7 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
         backgroundColor: colorFondo,
         elevation: 0,
         leading: IconButton(
+          tooltip: 'Volver',
           icon: const Icon(Icons.chevron_left, color: colorTexto),
           onPressed: () => Navigator.pop(context),
         ),
@@ -143,6 +144,7 @@ class _EstadoDetalleTarjeta extends State<PantallaDetalleTarjeta> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Editar',
             icon: const Icon(Icons.edit_outlined, color: colorTexto),
             onPressed: irAEditar,
           ),

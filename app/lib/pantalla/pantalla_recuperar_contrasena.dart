@@ -97,19 +97,23 @@ class _EstadoRecuperarContrasena extends State<PantallaRecuperarContrasena> {
               const SizedBox(height: 24),
               Row(
                 children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: colorBlanco,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: colorBorde),
+                  Semantics(
+                    label: 'Volver',
+                    button: true,
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: colorBlanco,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: colorBorde),
+                        ),
+                        child: const Icon(Icons.chevron_left, size: 20, color: colorTexto),
                       ),
-                      child: const Icon(Icons.chevron_left, size: 20, color: colorTexto),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -139,7 +143,7 @@ class _EstadoRecuperarContrasena extends State<PantallaRecuperarContrasena> {
                 style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.mail_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'princesa@uagrm.edu.bo',
+                  hintText: 'samira@uagrm.edu.bo',
                   errorText: errorCorreo,
                 ),
               ),

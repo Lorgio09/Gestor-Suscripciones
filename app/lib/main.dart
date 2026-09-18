@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'colores.dart';
 import 'tipografia.dart';
 import 'pantalla/pantalla_carga.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SemanticsBinding.instance.ensureSemantics();
   runApp(const MiApp());
 }
 

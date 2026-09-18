@@ -11,7 +11,10 @@ class Encabezado extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        InkWell(
+        Semantics(
+          label: 'Volver',
+          button: true,
+          child: InkWell(
           onTap: () => Navigator.pop(context),
           borderRadius: BorderRadius.circular(10),
           child: Container(
@@ -28,6 +31,7 @@ class Encabezado extends StatelessWidget {
               size: 14, 
               color: colorTexto 
             ),
+          ),
           ),
         ),
         

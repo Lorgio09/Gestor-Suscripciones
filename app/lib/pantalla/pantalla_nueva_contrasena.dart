@@ -78,19 +78,23 @@ class _EstadoNuevaContrasena extends State<PantallaNuevaContrasena> {
               const SizedBox(height: 24),
               Row(
                 children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: colorBlanco,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: colorBorde),
+                  Semantics(
+                    label: 'Volver',
+                    button: true,
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: colorBlanco,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: colorBorde),
+                        ),
+                        child: const Icon(Icons.chevron_left, size: 20, color: colorTexto),
                       ),
-                      child: const Icon(Icons.chevron_left, size: 20, color: colorTexto),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -112,6 +116,7 @@ class _EstadoNuevaContrasena extends State<PantallaNuevaContrasena> {
                   hintText: 'Mínimo 6 caracteres',
                   errorText: errorNueva,
                   suffixIcon: IconButton(
+                    tooltip: ocultarNueva ? 'Mostrar contraseña' : 'Ocultar contraseña',
                     icon: Icon(
                       ocultarNueva ? Icons.visibility_off : Icons.visibility,
                       color: colorTextoSecundario,
@@ -138,6 +143,7 @@ class _EstadoNuevaContrasena extends State<PantallaNuevaContrasena> {
                   hintText: 'Tiene que ser igual',
                   errorText: errorRepetir,
                   suffixIcon: IconButton(
+                    tooltip: ocultarRepetir ? 'Mostrar contraseña' : 'Ocultar contraseña',
                     icon: Icon(
                       ocultarRepetir ? Icons.visibility_off : Icons.visibility,
                       color: colorTextoSecundario,

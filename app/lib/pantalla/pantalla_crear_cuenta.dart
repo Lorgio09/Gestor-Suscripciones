@@ -138,7 +138,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                 style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.person_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'Princesa',
+                  hintText: 'Samira',
                   errorText: errorNombre,
                 ),
               ),
@@ -152,7 +152,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                 style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.mail_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'princesa@uagrm.edu.bo',
+                  hintText: 'samira@uagrm.edu.bo',
                   errorText: errorCorreo,
                 ),
               ),
@@ -169,6 +169,7 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
                   hintText: 'Mínimo 6 caracteres',
                   errorText: errorContrasena,
                   suffixIcon: IconButton(
+                    tooltip: ocultarContrasena ? 'Mostrar contraseña' : 'Ocultar contraseña',
                     icon: Icon(
                       ocultarContrasena ? Icons.visibility_off : Icons.visibility,
                       color: colorTextoSecundario,

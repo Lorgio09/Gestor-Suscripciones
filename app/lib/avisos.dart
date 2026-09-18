@@ -52,6 +52,3 @@ Future<void> revisarAvisos() async {
     }
   }
 }
-
-// Para una versión futura: aviso local a la hora elegida con flutter_local_notifications.
-Future<void> programarAvisosLocales() async {}

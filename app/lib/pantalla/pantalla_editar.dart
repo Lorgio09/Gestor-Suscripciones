@@ -6,6 +6,7 @@ import '../widgets/borde_punteado.dart';
 import '../colores.dart';
 import '../modelos/pago.dart';
 import '../tipografia.dart';
+import 'dialogo_color.dart';
 import 'encabezado.dart';
 import 'pantalla_agregar_tarjeta.dart';
 
@@ -33,6 +34,9 @@ class _EstadoEditar extends State<PantallaEditar> {
   List<Tarjeta> listaTarjetas = [];
   int? idTarjetaElegida;
 
+  List<Color> coloresDisponibles = List.from(coloresTarjeta);
+  Color colorElegido = coloresTarjeta.first;
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +45,49 @@ class _EstadoEditar extends State<PantallaEditar> {
     controlFecha = TextEditingController(text: widget.pago.fecha);
     controlUrl = TextEditingController(text: widget.pago.url);
     idTarjetaElegida = widget.pago.idTarjeta;
+    if (widget.pago.color.isNotEmpty) {
+      colorElegido = hexaAColor(widget.pago.color);
+      if (!coloresDisponibles.contains(colorElegido)) {
+        coloresDisponibles.add(colorElegido);
+      }
+    }
     cargarTarjetas();
+  }
+
+  Future<void> elegirOtroColor() async {
+    final color = await elegirColor(context, colorElegido);
+    if (color == null) return;
+    setState(() {
+      if (!coloresDisponibles.contains(color)) {
+        coloresDisponibles.add(color);
+      }
+      colorElegido = color;
+    });
+  }
+
+  Widget circuloColor(Color color) {
+    final elegido = colorElegido == color;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Semantics(
+        label: 'Color ${colorAHexa(color)}',
+        button: true,
+        selected: elegido,
+        child: InkWell(
+          onTap: () => setState(() => colorElegido = color),
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: elegido ? Border.all(color: colorTexto, width: 3) : null,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> cargarTarjetas() async {
@@ -155,6 +201,9 @@ class _EstadoEditar extends State<PantallaEditar> {
       motivoCancelacion: widget.pago.motivoCancelacion,
       fechaInicio: widget.pago.fechaInicio,
       fechaUltimoAviso: widget.pago.fechaUltimoAviso,
+      fechaCancelacion: widget.pago.fechaCancelacion,
+      fechaUltimoPago: widget.pago.fechaUltimoPago,
+      color: colorAHexa(colorElegido),
     );
 
     await actualizarPago(widget.pago.id!, pagoEditado);
@@ -310,6 +359,37 @@ class _EstadoEditar extends State<PantallaEditar> {
                   style: Tipografia.textoAyuda.copyWith(color: colorError),
                 ),
               ],
+              const SizedBox(height: 24),
+
+              Text('Color', style: Tipografia.etiqueta),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final color in coloresDisponibles) circuloColor(color),
+                    Semantics(
+                      label: 'Elegir otro color',
+                      button: true,
+                      child: InkWell(
+                        onTap: elegirOtroColor,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: colorBlanco,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: colorBorde),
+                          ),
+                          child: const Icon(Icons.add, size: 18, color: colorTextoSecundario),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
 
               SizedBox(

@@ -208,6 +208,7 @@ class _EstadoBilletera extends State<PantallaBilletera> {
           width: 56,
           height: 56,
           child: FloatingActionButton(
+            tooltip: 'Agregar tarjeta',
             backgroundColor: colorCoral,
             elevation: 0,
             shape: const CircleBorder(),

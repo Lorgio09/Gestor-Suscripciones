@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'colores.dart';
+import 'modelos/pago.dart';
+import 'pantalla/dialogo_color.dart';
 
 const nombresMes = [
   'ene', 'feb', 'mar', 'abr', 'may', 'jun',
@@ -26,6 +28,28 @@ Color colorPorNombre(String nombre) {
   }
   
   return paletaAvatares[suma % paletaAvatares.length];
+}
+
+String fechaDeHoy() {
+  final hoy = DateTime.now();
+  final dia = hoy.day.toString().padLeft(2, '0');
+  final mes = hoy.month.toString().padLeft(2, '0');
+  return '$dia/$mes/${hoy.year}';
+}
+
+DateTime? aFecha(String fecha) {
+  final partes = fecha.split('/');
+  if (partes.length != 3) return null;
+  return DateTime(
+    int.parse(partes[2]),
+    int.parse(partes[1]),
+    int.parse(partes[0]),
+  );
+}
+
+Color colorDePago(Pago pago) {
+  if (pago.color.isEmpty) return colorPorNombre(pago.nombre);
+  return hexaAColor(pago.color);
 }
 
 String calcularProximoPago(String fecha) {

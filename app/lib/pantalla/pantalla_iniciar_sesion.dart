@@ -108,7 +108,7 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
                 style: Tipografia.textoCampo,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.mail_outline, color: colorTextoSecundario, size: 20),
-                  hintText: 'princesa@uagrm.edu.bo',
+                  hintText: 'samira@uagrm.edu.bo',
                   errorText: errorCorreo,
                 ),
               ),
@@ -124,6 +124,7 @@ class _EstadoIniciarSesion extends State<PantallaIniciarSesion> {
                   prefixIcon: const Icon(Icons.lock_outline, color: colorTextoSecundario, size: 20),
                   errorText: errorContrasena,
                   suffixIcon: IconButton(
+                    tooltip: ocultarContrasena ? 'Mostrar contraseña' : 'Ocultar contraseña',
                     icon: Icon(
                       ocultarContrasena ? Icons.visibility_off : Icons.visibility,
                       color: colorTextoSecundario,

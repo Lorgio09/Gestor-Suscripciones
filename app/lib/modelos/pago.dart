@@ -10,6 +10,9 @@ class Pago {
   String motivoCancelacion;
   String fechaInicio;
   String? fechaUltimoAviso;
+  String? fechaCancelacion;
+  String? fechaUltimoPago;
+  String color;
 
   Pago({
     this.id,
@@ -23,6 +26,9 @@ class Pago {
     this.motivoCancelacion = "",
     this.fechaInicio = "",
     this.fechaUltimoAviso,
+    this.fechaCancelacion,
+    this.fechaUltimoPago,
+    this.color = "",
   });
 
   Map<String, dynamic> aMapa() {
@@ -38,6 +44,9 @@ class Pago {
       'motivoCancelacion': motivoCancelacion,
       'fechaInicio': fechaInicio.isEmpty ? fecha : fechaInicio,
       'fechaUltimoAviso': fechaUltimoAviso,
+      'fechaCancelacion': fechaCancelacion,
+      'fechaUltimoPago': fechaUltimoPago,
+      'color': color,
     };
   }
 
@@ -54,6 +63,9 @@ class Pago {
       motivoCancelacion: mapa['motivoCancelacion'] ?? "",
       fechaInicio: mapa['fechaInicio'] ?? mapa['fecha'],
       fechaUltimoAviso: mapa['fechaUltimoAviso'],
+      fechaCancelacion: mapa['fechaCancelacion'],
+      fechaUltimoPago: mapa['fechaUltimoPago'],
+      color: mapa['color'] ?? "",
     );
   }
 }

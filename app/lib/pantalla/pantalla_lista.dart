@@ -10,6 +10,7 @@ import '../sesion.dart';
 import '../tipografia.dart';
 import 'pantalla_registro.dart';
 import 'pantalla_detalle.dart';
+import 'pantalla_calendario.dart';
 
 class PantallaLista extends StatefulWidget {
   const PantallaLista({super.key});
@@ -22,6 +23,7 @@ class _EstadoLista extends State<PantallaLista> {
   List<Pago> listaPagos = [];
   List<Tarjeta> listaTarjetas = [];
   String nombreUsuario = '';
+  String filtro = 'activas';
 
   @override
   void initState() {
@@ -63,6 +65,13 @@ class _EstadoLista extends State<PantallaLista> {
     return menor;
   }
 
+  List<Pago> get pagosVisibles {
+    if (filtro == 'canceladas') {
+      return listaPagos.where((pago) => pago.estado == 'cancelada').toList();
+    }
+    return listaPagos.where((pago) => pago.estado != 'cancelada').toList();
+  }
+
   Tarjeta? tarjetaDe(Pago pago) {
     if (pago.idTarjeta == null) return null;
     for (final tarjeta in listaTarjetas) {
@@ -87,11 +96,49 @@ class _EstadoLista extends State<PantallaLista> {
     cargarTodo();
   }
 
+  void irACalendario() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (ctx) => const PantallaCalendario()),
+    );
+    cargarTodo();
+  }
+
+  Widget chipFiltro(String valor, String texto) {
+    final elegido = filtro == valor;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: () => setState(() => filtro = valor),
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 36,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: elegido ? colorCoral : colorBlanco,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: elegido ? colorCoral : colorBorde),
+          ),
+          child: Text(
+            texto,
+            style: Tipografia.etiqueta.copyWith(
+              color: elegido ? colorBlanco : colorTexto,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget resumen() {
     final activas = listaPagos.where((pago) => pago.estado != 'cancelada').length;
     final dias = diasParaElProximoCobro;
 
-    return Container(
+    return InkWell(
+      onTap: irACalendario,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
@@ -115,7 +162,13 @@ class _EstadoLista extends State<PantallaLista> {
             '$activas ${activas == 1 ? "activa" : "activas"} · próximo cobro en $dias ${dias == 1 ? "día" : "días"}',
             style: Tipografia.textoChico.copyWith(color: colorBlanco),
           ),
+          const SizedBox(height: 8),
+          Text(
+            '· tocá para ver el calendario',
+            style: Tipografia.textoAyuda.copyWith(color: colorBlanco),
+          ),
         ],
+      ),
       ),
     );
   }
@@ -123,13 +176,21 @@ class _EstadoLista extends State<PantallaLista> {
   Widget fila(Pago pago) {
     final proximo = calcularProximoPago(pago.fecha);
     final tarjeta = tarjetaDe(pago);
+    final cancelada = pago.estado == 'cancelada';
 
     String detalle = 'Vence el ${fechaCorta(proximo)}';
     if (tarjeta != null) {
       detalle = '$detalle · •••• ${tarjeta.ultimosDigitos}';
     }
+    if (cancelada) {
+      detalle = pago.fechaCancelacion == null
+          ? 'Cancelada'
+          : 'Cancelada el ${fechaCorta(pago.fechaCancelacion!)}';
+    }
 
-    return Card(
+    return Opacity(
+      opacity: cancelada ? 0.6 : 1,
+      child: Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: () => irADetalle(pago),
@@ -143,7 +204,7 @@ class _EstadoLista extends State<PantallaLista> {
                 height: 40,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorPorNombre(pago.nombre),
+                  color: colorDePago(pago),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -184,6 +245,7 @@ class _EstadoLista extends State<PantallaLista> {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -208,18 +270,28 @@ class _EstadoLista extends State<PantallaLista> {
               resumen(),
               const SizedBox(height: 16),
 
+              Row(
+                children: [
+                  chipFiltro('activas', 'Activas'),
+                  chipFiltro('canceladas', 'Canceladas'),
+                ],
+              ),
+              const SizedBox(height: 16),
+
               Expanded(
-                child: listaPagos.isEmpty
+                child: pagosVisibles.isEmpty
                     ? Center(
                         child: Text(
-                          'No hay suscripciones registradas.',
+                          filtro == 'canceladas'
+                              ? 'Todavía no cancelaste ninguna.'
+                              : 'No hay suscripciones registradas.',
                           style: Tipografia.textoAyuda,
                         ),
                       )
                     : ListView.builder(
                         padding: EdgeInsets.zero,
-                        itemCount: listaPagos.length,
-                        itemBuilder: (contexto, i) => fila(listaPagos[i]),
+                        itemCount: pagosVisibles.length,
+                        itemBuilder: (contexto, i) => fila(pagosVisibles[i]),
                       ),
               ),
             ],
@@ -232,6 +304,7 @@ class _EstadoLista extends State<PantallaLista> {
           width: 56,
           height: 56,
           child: FloatingActionButton(
+            tooltip: 'Agregar suscripción',
             backgroundColor: colorCoral,
             elevation: 0,
             shape: const CircleBorder(),
