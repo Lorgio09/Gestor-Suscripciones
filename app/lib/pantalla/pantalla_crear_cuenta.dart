@@ -26,11 +26,17 @@ class _EstadoCrearCuenta extends State<PantallaCrearCuenta> {
   @override
   void initState() {
     super.initState();
+    controlNombre.addListener(refrescar);
+    controlCorreo.addListener(refrescar);
     controlContrasena.addListener(refrescar);
   }
 
   void refrescar() {
-    setState(() {});
+    setState(() {
+      if (controlNombre.text.isNotEmpty) errorNombre = null;
+      if (controlCorreo.text.isNotEmpty) errorCorreo = null;
+      if (controlContrasena.text.isNotEmpty) errorContrasena = null;
+    });
   }
 
   Future<void> crearCuenta() async {

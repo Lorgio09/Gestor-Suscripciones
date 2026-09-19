@@ -491,8 +491,8 @@ class _EstadoDetalle extends State<PantallaDetalle> with WidgetsBindingObserver 
               tarjetaDato(
                 Icons.calendar_today,
                 'Próximo pago',
-                calcularProximoPago(pago.fecha),
-                colorValor: colorCoral,
+                pago.estado == 'cancelada' ? '—' : calcularProximoPago(pago.fecha),
+                colorValor: pago.estado == 'cancelada' ? colorTextoSecundario : colorCoral,
               ),
               const SizedBox(height: 16),
               tarjetaDato(
